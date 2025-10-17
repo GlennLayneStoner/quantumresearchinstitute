@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0b1116">
+<title>Research Portal — QRI</title>
+<style>
+:root{--bg:#0b1116;--bg-2:#0f1720;--ink:#e7edf3;--muted:#b8c4cf;--line:#1e2833;--accent:#26d07c;--accent-2:#5ac8ff;--radius:16px;--max:1120px;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:radial-gradient(1200px 600px at 75% 10%,#0e1822 0%,var(--bg) 65%) no-repeat fixed,var(--bg);color:var(--ink);line-height:1.6;}
+.container{max-width:var(--max);margin:0 auto;padding:0 24px;}
+.site-header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,rgba(7,11,14,.9),rgba(7,11,14,.6) 70%,rgba(7,11,14,0));border-bottom:1px solid var(--line);backdrop-filter:blur(6px);}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;}
+.brand{display:flex;align-items:center;gap:12px;color:var(--ink);text-decoration:none;font-weight:700;}
+.brand-badge{width:28px;height:28px;border-radius:8px;background:radial-gradient(60% 60% at 35% 35%,rgba(38,208,124,.35),transparent 60%),radial-gradient(60% 60% at 70% 70%,rgba(90,200,255,.25),transparent 60%),#0a2020;border:1px solid #193538;box-shadow:0 0 0 1px #0c2a30 inset,0 8px 24px rgba(7,180,150,.12);}
+.navlinks{display:flex;align-items:center;gap:24px;}
+.navlinks a{color:#d7e2ec;text-decoration:none;padding:8px 10px;border-radius:10px;}
+.navlinks a:hover,.navlinks a.active{background:#111a22;}
+main{padding:60px 0;}
+h1{font-size:clamp(30px,5vw,50px);font-weight:800;letter-spacing:-.5px;margin:0 0 8px;}
+.grid{display:grid;gap:20px;grid-template-columns:repeat(12,1fr);margin:24px 0;}
+.card{grid-column:span 6;background:linear-gradient(180deg,var(--bg-2),#0c131a);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:0 8px 24px rgba(0,0,0,.15);}
+.card h2{margin:0 0 8px;color:var(--accent);font-size:20px;}
+.card p{margin:0 0 10px;color:var(--muted);}
+.card a{color:var(--accent);text-decoration:none;font-weight:700;}
+@media(max-width:900px){.card{grid-column:1/-1;}}
+footer{border-top:1px solid var(--line);color:#9ab0bf;font-size:14px;background:#0a0f13;}
+footer .row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 0;}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav">
+    <a class="brand" href="/"><span class="brand-badge" aria-hidden="true"></span><span>QRI – the Quantum Research Institute</span></a>
+    <nav class="navlinks">
+      <a href="/about.html">About</a>
+      <a class="active" href="/research.html">Research Portal</a>
+      <a href="/resources.html">Resources</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>Research Portal</h1>
+  <p style="color:#b8c4cf;">A structured path from idea to articulation. Start with the literature, frame your hypothesis, model, and share.</p>
+
+  <div class="grid">
+    <section class="card">
+      <h2>1. Survey the Literature</h2>
+      <p>Find the state of the art, read broadly, and track citations.</p>
+      <p><a href="https://arxiv.org/" target="_blank" rel="noopener noreferrer">arXiv →</a> · <a href="https://inspirehep.net/" target="_blank" rel="noopener noreferrer">INSPIRE HEP →</a> · <a href="https://scholar.google.com/" target="_blank" rel="noopener noreferrer">Google Scholar →</a></p>
+    </section>
+
+    <section class="card">
+      <h2>2. Frame the Theory</h2>
+      <p>Write clearly. Define terms. Specify assumptions and scope.</p>
+      <p><a href="https://www.overleaf.com/" target="_blank" rel="noopener noreferrer">Overleaf (LaTeX) →</a> · <a href="https://www.zotero.org/" target="_blank" rel="noopener noreferrer">Zotero →</a></p>
+    </section>
+
+    <section class="card">
+      <h2>3. Model & Compute</h2>
+      <p>Prototype ideas, test limits, and visualize behavior.</p>
+      <p><a href="http://qutip.org/" target="_blank" rel="noopener noreferrer">QuTiP →</a> · <a href="https://numpy.org/" target="_blank" rel="noopener noreferrer">NumPy →</a> · <a href="https://scipy.org/" target="_blank" rel="noopener noreferrer">SciPy →</a> · <a href="https://jupyter.org/try" target="_blank" rel="noopener noreferrer">Jupyter →</a></p>
+    </section>
+
+    <section class="card">
+      <h2>4. Publish & Preserve</h2>
+      <p>Give your work a stable identity and a public record.</p>
+      <p><a href="https://zenodo.org/" target="_blank" rel="noopener noreferrer">Zenodo (DOIs) →</a> · <a href="https://orcid.org/" target="_blank" rel="noopener noreferrer">ORCID →</a> · <a href="https://arxiv.org/help" target="_blank" rel="noopener noreferrer">arXiv submission guide →</a></p>
+    </section>
+  </div>
+
+  <p class="small" style="color:#b8c4cf;">QRI is an independent entity and is not affiliated with any university or institution. External links are provided for educational purposes.</p>
+</main>
+
+<footer>
+  <div class="container row">
+    <small>© 2025 Quantum Research Institute, Princeton, TX</small>
+    <a href="/resources.html" style="color:#9ab0bf;text-decoration:none;">Resources</a>
+  </div>
+</footer>
+</body>
+</html>

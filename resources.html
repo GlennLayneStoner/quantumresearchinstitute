@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0b1116">
+<title>Resources — QRI</title>
+<style>
+:root{
+  --bg:#0b1116;
+  --bg-2:#0f1720;
+  --ink:#e7edf3;
+  --muted:#b8c4cf;
+  --line:#1e2833;
+  --accent:#26d07c;
+  --accent-2:#5ac8ff;
+  --radius:16px;
+  --max:1120px;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+  background:radial-gradient(1200px 600px at 75% 10%,#0e1822 0%,var(--bg) 65%) no-repeat fixed,var(--bg);
+  color:var(--ink);
+  line-height:1.6;
+}
+.container{max-width:var(--max);margin:0 auto;padding:0 24px;}
+.site-header{
+  position:sticky;top:0;z-index:10;
+  background:linear-gradient(180deg,rgba(7,11,14,.9),rgba(7,11,14,.6) 70%,rgba(7,11,14,0));
+  border-bottom:1px solid var(--line);
+  backdrop-filter:blur(6px);
+}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;}
+.brand{display:flex;align-items:center;gap:12px;color:var(--ink);text-decoration:none;font-weight:700;}
+.brand-badge{width:28px;height:28px;border-radius:8px;background:
+radial-gradient(60% 60% at 35% 35%,rgba(38,208,124,.35),transparent 60%),
+radial-gradient(60% 60% at 70% 70%,rgba(90,200,255,.25),transparent 60%),#0a2020;
+border:1px solid #193538;box-shadow:0 0 0 1px #0c2a30 inset,0 8px 24px rgba(7,180,150,.12);}
+.navlinks{display:flex;align-items:center;gap:24px;}
+.navlinks a{color:#d7e2ec;text-decoration:none;padding:8px 10px;border-radius:10px;}
+.navlinks a:hover,.navlinks a.active{background:#111a22;}
+main{padding:60px 0;}
+h1{font-size:clamp(30px,5vw,50px);font-weight:800;letter-spacing:-.5px;margin:0 0 8px;}
+p{color:var(--muted);}
+.notice{
+  border:1px solid var(--line);
+  background:rgba(255,255,255,0.02);
+  border-radius:var(--radius);
+  padding:18px 20px;
+  color:var(--muted);
+  margin:20px 0 40px;
+  font-size:15px;
+}
+.section{margin:60px 0;}
+h2{color:var(--accent);font-size:22px;margin:0 0 10px;}
+ul{list-style:none;padding:0;margin:0;}
+ul li{margin:10px 0;}
+ul a{color:var(--accent);text-decoration:none;font-weight:600;}
+ul a:hover{text-decoration:underline;}
+.small{font-size:14px;color:var(--muted);}
+footer{
+  border-top:1px solid var(--line);
+  color:#9ab0bf;
+  font-size:14px;
+  background:#0a0f13;
+}
+footer .row{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;padding:16px 0;
+}
+@media(max-width:860px){
+  .navlinks{display:none;}
+}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav" id="nav">
+    <a class="brand" href="/">
+      <span class="brand-badge" aria-hidden="true"></span>
+      <span>QRI – the Quantum Research Institute</span>
+    </a>
+    <nav class="navlinks">
+      <a href="/about.html">About</a>
+      <a href="/research.html">Research Portal</a>
+      <a class="active" href="/resources.html">Resources</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>Resources</h1>
+  <p>Curated, open materials for serious independent study. Each link below leads to publicly available content from respected institutions. QRI provides these purely for educational use and has no affiliation with any host organization.</p>
+  <div class="notice"><strong>External Resources:</strong> All materials remain property of their original publishers. QRI does not host or modify any external content.</div>
+
+  <section class="section">
+    <h2>Quantum Physics</h2>
+    <ul>
+      <li><a href="https://ocw.mit.edu/courses/8-04-quantum-physics-i-fall-2016/" target="_blank" rel="noopener noreferrer">MIT OCW: 8.04 Quantum Physics I</a></li>
+      <li><a href="https://www.feynmanlectures.caltech.edu/" target="_blank" rel="noopener noreferrer">The Feynman Lectures on Physics (Caltech)</a></li>
+      <li><a href="https://quantum.country/" target="_blank" rel="noopener noreferrer">Quantum Country — memory-based essays</a></li>
+      <li><a href="https://qiskit.org/textbook/preface.html" target="_blank" rel="noopener noreferrer">Qiskit Textbook — quantum computing foundations</a></li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2>Mathematical Foundations</h2>
+    <ul>
+      <li><a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/" target="_blank" rel="noopener noreferrer">MIT OCW: Linear Algebra (Strang)</a></li>
+      <li><a href="https://ocw.mit.edu/courses/18-03-differential-equations-spring-2010/" target="_blank" rel="noopener noreferrer">MIT OCW: Differential Equations</a></li>
+      <li><a href="https://www.khanacademy.org/math/linear-algebra" target="_blank" rel="noopener noreferrer">Khan Academy: Linear Algebra Basics</a></li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2>Open Literature and Tools</h2>
+    <ul>
+      <li><a href="https://arxiv.org/" target="_blank" rel="noopener noreferrer">arXiv — Preprints in physics, math, and CS</a></li>
+      <li><a href="http://qutip.org/" target="_blank" rel="noopener noreferrer">QuTiP — Quantum Toolbox in Python</a></li>
+      <li><a href="https://jupyter.org/try" target="_blank" rel="noopener noreferrer">Jupyter — Interactive notebooks</a></li>
+      <li><a href="https://zenodo.org/" target="_blank" rel="noopener noreferrer">Zenodo — Research archiving with DOI</a></li>
+      <li><a href="https://orcid.org/" target="_blank" rel="noopener noreferrer">ORCID — Researcher identification</a></li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2>Ethics and Best Practice</h2>
+    <ul>
+      <li><a href="https://ori.hhs.gov/" target="_blank" rel="noopener noreferrer">Office of Research Integrity (US)</a></li>
+      <li><a href="https://creativecommons.org/licenses/" target="_blank" rel="noopener noreferrer">Creative Commons Licenses</a></li>
+    </ul>
+  </section>
+</main>
+
+<footer>
+  <div class="container row">
+    <small>© 2025 Quantum Research Institute, Princeton, TX — Independent entity, unaffiliated with any university or institution.</small>
+    <a href="/contact.html" style="color:#9ab0bf;text-decoration:none;">Contact</a>
+  </div>
+</footer>
+</body>
+</html>

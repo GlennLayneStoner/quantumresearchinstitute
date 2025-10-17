@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0b1116">
+<title>About — QRI</title>
+<style>
+:root{--bg:#0b1116;--bg-2:#0f1720;--ink:#e7edf3;--muted:#b8c4cf;--line:#1e2833;--accent:#26d07c;--accent-2:#5ac8ff;--radius:16px;--max:1120px;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:radial-gradient(1200px 600px at 75% 10%,#0e1822 0%,var(--bg) 65%) no-repeat fixed,var(--bg);color:var(--ink);line-height:1.6;}
+.container{max-width:var(--max);margin:0 auto;padding:0 24px;}
+.site-header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,rgba(7,11,14,.9),rgba(7,11,14,.6) 70%,rgba(7,11,14,0));border-bottom:1px solid var(--line);backdrop-filter:blur(6px);}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;}
+.brand{display:flex;align-items:center;gap:12px;color:var(--ink);text-decoration:none;font-weight:700;}
+.brand-badge{width:28px;height:28px;border-radius:8px;background:radial-gradient(60% 60% at 35% 35%,rgba(38,208,124,.35),transparent 60%),radial-gradient(60% 60% at 70% 70%,rgba(90,200,255,.25),transparent 60%),#0a2020;border:1px solid #193538;box-shadow:0 0 0 1px #0c2a30 inset,0 8px 24px rgba(7,180,150,.12);}
+.navlinks{display:flex;align-items:center;gap:24px;}
+.navlinks a{color:#d7e2ec;text-decoration:none;padding:8px 10px;border-radius:10px;}
+.navlinks a:hover,.navlinks a.active{background:#111a22;}
+main{padding:60px 0;}
+h1{font-size:clamp(30px,5vw,50px);font-weight:800;letter-spacing:-.5px;margin:0 0 10px;}
+.tagline{font-size:18px;color:var(--accent);margin:0 0 24px;}
+.section{margin:34px 0 0;border-top:1px solid var(--line);padding-top:24px;}
+.section:first-of-type{border-top:0;padding-top:0;}
+h2{color:var(--accent);font-size:22px;margin:0 0 10px;}
+p{color:var(--muted);margin:8px 0 14px;}
+ul{color:var(--muted);margin:8px 0 14px;}
+footer{border-top:1px solid var(--line);color:#9ab0bf;font-size:14px;background:#0a0f13;}
+footer .row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 0;}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav">
+    <a class="brand" href="/"><span class="brand-badge" aria-hidden="true"></span><span>QRI – the Quantum Research Institute</span></a>
+    <nav class="navlinks">
+      <a class="active" href="/about.html">About</a>
+      <a href="/research.html">Research Portal</a>
+      <a href="/resources.html">Resources</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <h1>About the Quantum Research Institute</h1>
+  <p class="tagline">Where independent thought meets scientific discipline.</p>
+
+  <section class="section">
+    <h2>Purpose</h2>
+    <p>The Quantum Research Institute was founded to make advanced physics accessible to independent minds. While our focus is on <strong>quantum physics</strong>, our reach extends through <strong>cosmology</strong>, <strong>thermodynamics</strong>, and the broader foundations of reality — because understanding one requires understanding how they connect.</p>
+  </section>
+
+  <section class="section">
+    <h2>What We Do</h2>
+    <p>We provide a structured environment where ideas evolve from insight into theory. Our resources help individuals:</p>
+    <ul>
+      <li>Understand what a scientific theory is and how to construct one.</li>
+      <li>Explore quantum physics as a rigorous framework, not mysticism.</li>
+      <li>Access curated resources, simulators, and tools for modeling and analysis.</li>
+      <li>Develop the skills to communicate new ideas effectively.</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2>Why It Matters</h2>
+    <p>Breakthroughs often begin far from institutions. They start with individuals who see familiar problems in new ways. QRI supports those individuals — offering guidance without gatekeeping and clarity without pretension.</p>
+  </section>
+
+  <section class="section">
+    <h2>Our Guiding Principle</h2>
+    <p>Science belongs to everyone willing to think with precision. At QRI, curiosity is the raw material. Structure is the result.</p>
+  </section>
+
+  <section class="section">
+    <p><strong>Founder:</strong> Glenn L. Stoner</p>
+    <p><strong>Contact:</strong> <a href="mailto:contact@quantumresearchinstitute.com">contact@quantumresearchinstitute.com</a></p>
+  </section>
+</main>
+
+<footer>
+  <div class="container row">
+    <small>© 2025 Quantum Research Institute, Princeton, TX — Independent entity, unaffiliated with any university or institution.</small>
+    <a href="/contact.html" style="color:#9ab0bf;text-decoration:none;">Contact</a>
+  </div>
+</footer>
+</body>
+</html>
