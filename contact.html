@@ -82,6 +82,14 @@ p{color:var(--muted);}
 /* ---------- Footer ---------- */
 footer{border-top:1px solid var(--line);color:#9ab0bf;font-size:14px;background:#0a0f13;}
 footer .row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 0;}
+/* --- Bulletproof mobile nav --- */
+/* Hide by default, then enable on desktop or when .open is set */
+.site-header .nav .navlinks { display: none !important; }
+@media (min-width: 981px){
+  .site-header .nav .navlinks { display: flex !important; }
+}
+.site-header .nav.open .navlinks { display: flex !important; } /* works on all widths */
+
 </style>
 </head>
 
@@ -143,5 +151,40 @@ function toggleNav(){
   btn.setAttribute('aria-expanded', isOpen);
 }
 </script>
+<script>
+function toggleNav(){
+  const nav = document.getElementById('nav');
+  if (!nav) return;
+  const btn = nav.querySelector('.nav-toggle');
+  const isOpen = nav.classList.toggle('open');
+  if (btn) btn.setAttribute('aria-expanded', isOpen);
+}
+// safety: ensure it's closed on load
+document.addEventListener('DOMContentLoaded', () => {
+  const nav = document.getElementById('nav');
+  if (nav) nav.classList.remove('open');
+});
+// close when tapping outside or a link, and on Esc
+document.addEventListener('click', (e) => {
+  const nav = document.getElementById('nav');
+  if (!nav || !nav.classList.contains('open')) return;
+  if (!nav.contains(e.target) || e.target.closest('.navlinks a')){
+    nav.classList.remove('open');
+    const btn = nav.querySelector('.nav-toggle');
+    if (btn) btn.setAttribute('aria-expanded','false');
+  }
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape'){
+    const nav = document.getElementById('nav');
+    if (nav) {
+      nav.classList.remove('open');
+      const btn = nav.querySelector('.nav-toggle');
+      if (btn) btn.setAttribute('aria-expanded','false');
+    }
+  }
+});
+</script>
+
 </body>
 </html>
