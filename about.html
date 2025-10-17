@@ -13,6 +13,30 @@
 <link rel="shortcut icon" href="/favicon.ico">
 
 <style>
+  .site-header .nav { position: relative; }
+
+@media (max-width: 980px){
+  .nav-toggle{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:8px 12px; border-radius:10px;
+    background:#0f1820; color:#cfe5f5; border:1px solid #23303c;
+  }
+  .navlinks{
+    display:none; position:absolute; top:100%; right:24px; z-index:20;
+    flex-direction:column; gap:6px; padding:8px;
+    width:min(260px, calc(100vw - 48px));
+    background:#0f1720; border:1px solid var(--line); border-radius:12px;
+    box-shadow:0 12px 30px rgba(0,0,0,.35);
+  }
+  .nav.open .navlinks{ display:flex; }
+  .navlinks a{ padding:10px 12px; border-radius:10px; }
+  .navlinks a:hover{ background:#111a22; }
+}
+
+@media (min-width: 981px){
+  .nav-toggle{ display:none; }
+}
+
 :root{--bg:#0b1116;--bg-2:#0f1720;--ink:#e7edf3;--muted:#b8c4cf;--line:#1e2833;--accent:#26d07c;--accent-2:#5ac8ff;--radius:16px;--max:1120px;}
 *{box-sizing:border-box;}
 body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:radial-gradient(1200px 600px at 75% 10%,#0e1822 0%,var(--bg) 65%) no-repeat fixed,var(--bg);color:var(--ink);line-height:1.6;}
@@ -37,6 +61,29 @@ footer .row{display:flex;align-items:center;justify-content:space-between;gap:16
 </style>
 </head>
 <body>
+  <header class="site-header">
+  <div class="container nav" id="nav">
+    <a class="brand" href="/index.html">
+      <span class="brand-badge" aria-hidden="true"></span>
+      <span>QRI – the Quantum Research Institute</span>
+    </a>
+
+    <button class="nav-toggle" aria-label="Menu" aria-expanded="false" onclick="toggleNav()">
+      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+      Menu
+    </button>
+
+    <nav class="navlinks">
+      <a class="active" href="/about.html">About</a>
+      <a href="/research.html">Research Portal</a>
+      <a href="/resources.html">Resources</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
 <header class="site-header">
   <div class="container nav">
     <a class="brand" href="/"><span class="brand-badge" aria-hidden="true"></span><span>QRI – the Quantum Research Institute</span></a>
@@ -108,5 +155,14 @@ src="https://c.statcounter.com/13176686/0/1c58bc44/1/"
 alt="Web Analytics"
 referrerPolicy="no-referrer-when-downgrade"></a></div></noscript>
 <!-- End of Statcounter Code -->
+<script>
+function toggleNav(){
+  const nav = document.getElementById('nav');
+  const btn = nav.querySelector('.nav-toggle');
+  const isOpen = nav.classList.toggle('open');
+  btn.setAttribute('aria-expanded', isOpen);
+}
+</script>
+
 </body>
 </html>
