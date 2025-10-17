@@ -148,5 +148,30 @@ src="https://c.statcounter.com/13176686/0/1c58bc44/1/"
 alt="Web Analytics"
 referrerPolicy="no-referrer-when-downgrade"></a></div></noscript>
 <!-- End of Statcounter Code -->
+<script>
+function toggleNav(){
+  const nav = document.getElementById('nav');
+  const btn = nav.querySelector('.nav-toggle');
+  const isOpen = nav.classList.toggle('open');
+  btn.setAttribute('aria-expanded', isOpen);
+}
+
+// Close menu when a link is clicked or on outside click / Esc
+document.addEventListener('click', (e) => {
+  const nav = document.getElementById('nav');
+  if (!nav) return;
+  const open = nav.classList.contains('open');
+  if (!open) return;
+  if (!nav.contains(e.target)) { nav.classList.remove('open'); nav.querySelector('.nav-toggle').setAttribute('aria-expanded','false'); }
+  if (e.target.closest('.navlinks a')) { nav.classList.remove('open'); nav.querySelector('.nav-toggle').setAttribute('aria-expanded','false'); }
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape'){
+    const nav = document.getElementById('nav');
+    if (nav) { nav.classList.remove('open'); const btn = nav.querySelector('.nav-toggle'); if (btn) btn.setAttribute('aria-expanded','false'); }
+  }
+});
+</script>
+
 </body>
 </html>
