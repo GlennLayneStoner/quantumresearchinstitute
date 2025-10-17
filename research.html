@@ -38,8 +38,18 @@ footer .row{display:flex;align-items:center;justify-content:space-between;gap:16
 </head>
 <body>
 <header class="site-header">
-  <div class="container nav">
-    <a class="brand" href="/"><span class="brand-badge" aria-hidden="true"></span><span>QRI – the Quantum Research Institute</span></a>
+  <div class="container nav" id="nav">
+    <a class="brand" href="/">
+      <span class="brand-badge" aria-hidden="true"></span>
+      <span>QRI – the Quantum Research Institute</span>
+    </a>
+
+    <button class="nav-toggle" aria-label="Menu" aria-expanded="false" onclick="toggleNav()">
+      <!-- simple icon -->
+      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      Menu
+    </button>
+
     <nav class="navlinks">
       <a href="/about.html">About</a>
       <a class="active" href="/research.html">Research Portal</a>
@@ -48,6 +58,7 @@ footer .row{display:flex;align-items:center;justify-content:space-between;gap:16
     </nav>
   </div>
 </header>
+
 
 <main class="container">
   <h1>Research Portal</h1>
