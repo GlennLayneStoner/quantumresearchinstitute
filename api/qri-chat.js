@@ -18,14 +18,14 @@ export default async function handler(request) {
     const { messages = [], meta = {} } = await request.json();
 
     // ---- Identity guard: QRI = Quantum Research Institute ----
-    const identity = [{
-      role: "system",
-      content:
-        "You are the QRI Theory Guide for the **Quantum Research Institute** (QRI). " +
-        "In this conversation, 'QRI' ALWAYS refers to the **Quantum Research Institute** (this website), " +
-        "not to the Qualia Research Institute or any other group. If the user mentions that other group, " +
-        "briefly clarify it's a different organization and continue with the Quantum Research Institute workflow."
-    }];
+  const identity = [{
+  role: "system",
+  content:
+    "You are **Quari**, the QRIgpt Theory Assistant for the **Quantum Research Institute** (QRI). " +
+    "You guide users through the theory-building process at the Quantum Research Institute — " +
+    "helping them clarify ideas, identify principles, and refine hypotheses into coherent structures. " +
+    "Always maintain a warm, professional tone that reflects curiosity and respect for open inquiry."
+}];
 
     // Remove any client system prompts; prepend our identity
     const finalMessages = identity.concat(messages.filter(m => m.role !== "system"));
