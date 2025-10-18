@@ -338,11 +338,12 @@ scrim.addEventListener('click', closeMenu);
 window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeMenu(); });
 </script>
 
- <!-- QRI Chat Drawer -->
+<!-- QRI Chat Drawer -->
 <div id="qri-drawer" class="qri-drawer">
-  <iframe src="/chat.html" title="QRI" loadgpting="lazy"></iframe>
+  <button id="qri-close" class="qri-close" aria-label="Close chat">✕</button>
+  <iframe src="/chat.html" title="QRI Guide" loading="lazy"></iframe>
 </div>
-<button id="qri-toggle" class="qri-toggle" aria-controls="qri-drawer" aria-expanded="false">💬 QRIgpt</button>
+<button id="qri-toggle" class="qri-toggle" aria-controls="qri-drawer" aria-expanded="false">💬Queri</button>
 
 <style>
   .qri-drawer{
