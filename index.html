@@ -124,6 +124,41 @@ a,button{touch-action:manipulation}
 .qri-close:hover{background:rgba(30,50,64,.95)}
 .qri-drawer:not(.open) .qri-close{opacity:0;pointer-events:none;transform:translateY(-4px)}
 .qri-drawer.open .qri-close{opacity:1;pointer-events:auto;transform:translateY(0)}
+
+/* ---------- Splash cover ---------- */
+.splash {
+  position: fixed; inset: 0; z-index: 2000;
+  display: grid; place-items: center;
+  background: radial-gradient(1200px 600px at 75% 10%, #0e1822 0%, var(--bg) 65%), var(--bg);
+  color: var(--ink);
+  transition: opacity .35s ease;
+}
+.splash.hidden { opacity: 0; pointer-events: none; }
+
+.splash-card{
+  text-align:center; padding:32px 28px; max-width:640px;
+  background: linear-gradient(180deg, var(--bg-2), #0c131a);
+  border:1px solid var(--line); border-radius: var(--radius);
+  box-shadow: 0 16px 60px rgba(0,0,0,.35);
+}
+.splash-badge{
+  width:44px;height:44px;border-radius:10px;margin:0 auto 14px;
+  background:
+    radial-gradient(60% 60% at 35% 35%, rgba(38,208,124,.35), transparent 60%),
+    radial-gradient(60% 60% at 70% 70%, rgba(90,200,255,.25), transparent 60%), #0a2020;
+  border:1px solid #193538; box-shadow:0 0 0 1px #0c2a30 inset;
+}
+.splash h1{ margin:6px 0 6px; font-weight:800; letter-spacing:-.4px; font-size:clamp(22px,4.8vw,34px); }
+.splash p{ margin:6px 0 0; color: var(--muted); }
+.splash .tag { color: var(--accent); font-weight:700; letter-spacing:.12em; text-transform:uppercase; font-size:12px; }
+.splash .skip {
+  margin-top:18px; display:inline-block; font-weight:700; text-decoration:none;
+  padding:10px 14px; border-radius:12px; background:#0f1820; color:#cfe5f5; border:1px solid #23303c;
+}
+@media (prefers-reduced-motion: reduce){
+  .splash{ transition: none; }
+}
+
 </style>
 </head>
 <body>
