@@ -1,31 +1,244 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>QRIgpt Guide</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>QRI Guide</title>
+<meta name="color-scheme" content="dark light" />
 <style>
-body{background:#0b1116;color:#e6edf3;font:16px/1.5 system-ui;padding:16px}
+  :root{
+    --bg:#0b1116; --panel:#101820; --text:#e6edf3; --muted:#cbd5e1;
+    --border:rgba(255,255,255,.08); --link:#7cc7ff; --accent:#89f0c3;
+    --radius:14px; --shadow:0 10px 30px rgba(0,0,0,.45);
+  }
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+  a{color:var(--link)}
+  .wrap{display:flex;flex-direction:column;min-height:100vh}
+  header{position:sticky;top:0;background:linear-gradient(180deg, rgba(11,17,22,.95), rgba(11,17,22,.75));backdrop-filter:saturate(140%) blur(6px);border-bottom:1px solid var(--border);z-index:10}
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 1px var(--border) inset}
+  .badge{font-size:.85rem;color:var(--muted)}
+  .btn{display:inline-flex;align-items:center;gap:8px;background:#173a2c;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:8px 10px;cursor:pointer}
+  .btn.secondary{background:#132430}
+  .btn:disabled{opacity:.6;cursor:not-allowed}
+
+  /* chat area */
+  .chat{flex:1;overflow:auto;padding:14px}
+  .msg{display:flex;gap:10px;margin:10px 0}
+  .msg .bubble{max-width:85%;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 12px;box-shadow:var(--shadow);white-space:pre-wrap;word-wrap:break-word}
+  .msg.user{justify-content:flex-end}
+  .msg.user .bubble{background:#18252f}
+  .msg.assistant .avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#2bd,#7ff)}
+  .msg.user .avatar{display:none}
+  .thinking{opacity:.8}
+  .code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.95rem;line-height:1.5;background:#0f1720;padding:10px;border-radius:10px;border:1px solid var(--border)}
+
+  /* composer */
+  .composer{position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--border);padding:10px}
+  .row{display:flex;gap:10px;align-items:center}
+  textarea{flex:1;min-height:52px;max-height:38vh;resize:vertical;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:10px}
+  .send{min-width:54px;height:44px}
+  .tools{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:8px;color:var(--muted);font-size:.9rem}
+  label.inline{display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+  .safe-bottom{padding-bottom:env(safe-area-inset-bottom)}
 </style>
 </head>
 <body>
-<h2>QRIgpt</h2>
-<p>Coming soon (later today). This panel will connect to the dedicated QRIgpt assistant.</p>
-<!-- Default Statcounter code for QRI analytics
-http://www.QuantumResearchInstitute.com -->
-<script type="text/javascript">
-var sc_project=13176686; 
-var sc_invisible=1; 
-var sc_security="1c58bc44"; 
+<div class="wrap">
+  <header>
+    <div class="bar">
+      <div class="brand">
+        <div class="dot" aria-hidden="true"></div>
+        <div>
+          <strong>QRI Theory Guide</strong><br>
+          <span class="badge">Gate 1 to 4 workflow assistant</span>
+        </div>
+      </div>
+      <div class="actions" style="display:flex;gap:8px">
+        <button id="newBtn" class="btn secondary" title="New session">New</button>
+        <button id="exportBtn" class="btn secondary" title="Download as .txt">Export</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="chat" id="chat" aria-live="polite" aria-label="Chat messages"></main>
+
+  <footer class="composer safe-bottom">
+    <div class="row">
+      <textarea id="input" placeholder="Describe your idea or paste a section of your draft... Ctrl+Enter to send"></textarea>
+      <button id="sendBtn" class="btn send">Send</button>
+    </div>
+    <div class="tools">
+      <label class="inline">
+        <input type="checkbox" id="escalateBox">
+        Escalate for math or proofs (uses higher power model for this one turn)
+      </label>
+      <div id="usage" class="badge">0 messages in this session</div>
+    </div>
+  </footer>
+</div>
+
+<script>
+/* ---------- config ---------- */
+const API_URL = "/api/qri-chat"; // your server endpoint
+const SYSTEM_PROMPT = `You are the QRI Theory Guide. Turn an idea into a rigorous plan through four gates:
+1) Articulate the thesis in one sentence and define terms.
+2) Ground with prior art and at least one falsifiable prediction.
+3) Build the minimal model with variables and measurable outputs.
+4) Plan an experiment or derivation with controls and failure modes.
+Keep answers short, numbered, and end with one actionable next step. If the user asks for math or proofs, and meta.escalate is true, use the higher power model for that single turn. Avoid jargon unless asked.`;
+const HISTORY_KEY = "qriHistoryV1";       // localStorage key
+const MAX_TURNS  = 30;                     // keep history light
+const STREAMING  = true;                   // try to stream if server supports it
+
+/* ---------- state ---------- */
+const chatEl = document.getElementById('chat');
+const inputEl = document.getElementById('input');
+const sendBtn = document.getElementById('sendBtn');
+const newBtn = document.getElementById('newBtn');
+const exportBtn = document.getElementById('exportBtn');
+const escalateBox = document.getElementById('escalateBox');
+const usageEl = document.getElementById('usage');
+
+let history = loadHistory();
+renderHistory();
+
+/* ---------- helpers ---------- */
+function loadHistory(){
+  try{
+    const raw = localStorage.getItem(HISTORY_KEY);
+    return raw ? JSON.parse(raw) : [{role:"system", content:SYSTEM_PROMPT}];
+  }catch{ return [{role:"system", content:SYSTEM_PROMPT}]; }
+}
+function saveHistory(){
+  const trimmed = history.slice(-1 - MAX_TURNS*2); // keep system + last N turns
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(trimmed));
+  const turns = Math.max(0, Math.floor((trimmed.length-1)/2));
+  usageEl.textContent = `${turns} message${turns===1?"":"s"} in this session`;
+}
+function el(tag, cls, html){ const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; }
+
+function addMessage(role, content){
+  const row = el('div', `msg ${role}`);
+  const avatar = el('div','avatar');
+  const bubble = el('div','bubble');
+  bubble.innerHTML = sanitize(content);
+  if(role==='assistant'){ row.appendChild(avatar); }
+  row.appendChild(bubble);
+  chatEl.appendChild(row);
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+function sanitize(str){
+  // very light sanitizer: escape angle brackets
+  return String(str).replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    // simple markdown-ish code blocks
+    .replace(/```([\s\S]*?)```/g, (_,code)=>`<div class="code">${code.replace(/</g,"&lt;")}</div>`);
+}
+
+/* ---------- initial render ---------- */
+function renderHistory(){
+  chatEl.innerHTML = "";
+  for(const m of history){
+    if(m.role==='system') continue;
+    addMessage(m.role, m.content);
+  }
+  saveHistory();
+}
+
+/* ---------- sending ---------- */
+async function sendCurrent(){
+  const text = inputEl.value.trim();
+  if(!text) return;
+  inputEl.value = "";
+  addMessage('user', text);
+  history.push({role:"user", content:text});
+  saveHistory();
+
+  // placeholder assistant bubble while we wait
+  const row = el('div','msg assistant');
+  const avatar = el('div','avatar');
+  const bubble = el('div','bubble thinking'); bubble.textContent = "Thinking...";
+  row.appendChild(avatar); row.appendChild(bubble);
+  chatEl.appendChild(row); chatEl.scrollTop = chatEl.scrollHeight;
+
+  sendBtn.disabled = true;
+
+  try{
+    const body = {
+      messages: history,
+      meta: { escalate: !!escalateBox.checked }
+    };
+
+    const res = await fetch(API_URL, {
+      method:"POST",
+      headers: { "Content-Type":"application/json" },
+      body: JSON.stringify(body)
+    });
+
+    // Try streaming if response is not application/json
+    const ctype = res.headers.get("Content-Type") || "";
+    if(STREAMING && !ctype.includes("application/json") && res.body && "getReader" in res.body){
+      bubble.textContent = "";
+      let acc = "";
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      while(true){
+        const {done, value} = await reader.read();
+        if(done) break;
+        const chunk = decoder.decode(value, {stream:true});
+        // If server sends SSE lines like: "data: { delta: 'text' }"
+        const lines = chunk.split(/\r?\n/).filter(Boolean);
+        for(const line of lines){
+          const m = line.startsWith("data:") ? line.slice(5).trim() : line;
+          try{
+            const obj = JSON.parse(m);
+            const delta = obj.delta ?? obj.content ?? "";
+            acc += delta;
+            bubble.innerHTML = sanitize(acc);
+            chatEl.scrollTop = chatEl.scrollHeight;
+          }catch{
+            // plain text stream fallback
+            acc += m;
+            bubble.innerHTML = sanitize(acc);
+          }
+        }
+      }
+      bubble.classList.remove('thinking');
+      history.push({role:"assistant", content:acc});
+    }else{
+      // non streaming JSON: { role:"assistant", content:"..." }
+      const data = await res.json();
+      bubble.classList.remove('thinking');
+      bubble.innerHTML = sanitize(data.content || "");
+      history.push({role:"assistant", content:data.content || ""});
+    }
+    saveHistory();
+  }catch(err){
+    bubble.classList.remove('thinking');
+    bubble.innerHTML = sanitize("Sorry, I could not reach the QRI server. Please try again in a moment.");
+  }finally{
+    sendBtn.disabled = false;
+  }
+}
+
+sendBtn.addEventListener('click', sendCurrent);
+inputEl.addEventListener('keydown', (e)=>{
+  if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){ sendCurrent(); }
+});
+document.getElementById('newBtn').addEventListener('click', ()=>{
+  history = [{role:"system", content:SYSTEM_PROMPT}];
+  saveHistory(); renderHistory();
+});
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  const transcript = history.filter(m=>m.role!=="system")
+    .map(m=>`${m.role.toUpperCase()}:\n${m.content}\n`).join("\n");
+  const blob = new Blob([transcript], {type:"text/plain"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = "qri_session.txt"; a.click();
+  URL.revokeObjectURL(url);
+});
 </script>
-<script type="text/javascript"
-src="https://www.statcounter.com/counter/counter.js"
-async></script>
-<noscript><div class="statcounter"><a title="Web Analytics"
-href="https://statcounter.com/" target="_blank"><img
-class="statcounter"
-src="https://c.statcounter.com/13176686/0/1c58bc44/1/"
-alt="Web Analytics"
-referrerPolicy="no-referrer-when-downgrade"></a></div></noscript>
-<!-- End of Statcounter Code -->
 </body>
 </html>
