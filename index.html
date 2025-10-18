@@ -48,6 +48,7 @@ body{
 .nav{
   display:flex; align-items:center; justify-content:space-between;
   gap:16px; padding:14px 0;
+  position: relative; /* for the absolute mobile menu */
 }
 .brand{
   display:flex; align-items:center; gap:12px;
@@ -154,11 +155,44 @@ h1{
   .hero-grid{ grid-template-columns:1fr; }
   .hero-art{ height:220px; }
 }
+
+/* Mobile menu as overlay (no push-down) */
 @media (max-width: 860px){
-  .nav-toggle{ display:inline-flex; align-items:center; padding:8px 12px; border-radius:10px; background:#0f1820; color:#cfe5f5; border:1px solid #23303c; }
-  .navlinks{ display:none; }
-  .nav.open .navlinks{ display:flex; flex-direction:column; gap:8px; padding:8px 0 0; }
+  .nav-toggle{
+    display:inline-flex; align-items:center; padding:8px 12px;
+    border-radius:10px; background:#0f1820; color:#cfe5f5; border:1px solid #23303c;
+  }
+
+  /* Turn the nav list into an overlay panel */
+  .navlinks{
+    position:absolute; top:100%; right:0;
+    width:260px; padding:12px 10px; margin:0;
+    background:#0f1820; border:1px solid #23303c; border-radius:12px;
+    box-shadow: 0 12px 28px rgba(0,0,0,.45);
+    list-style:none; gap:8px; flex-direction:column;
+    opacity:0; transform: translateY(-6px);
+    pointer-events:none;
+    z-index:1000;
+  }
+  .navlinks a{ display:block; }
+
+  /* Open state */
+  .nav.open .navlinks{
+    opacity:1; transform: translateY(0); pointer-events:auto;
+    transition: transform .18s ease, opacity .18s ease;
+  }
+
+  /* Backdrop */
+  .nav-scrim{
+    position: fixed; inset: 0; background: rgba(0,0,0,.35);
+    z-index:9; display:none;
+  }
+  body.nav-open .nav-scrim{ display:block; }
+
+  /* Prevent scroll when menu open */
+  body.nav-open { overflow:hidden; }
 }
+
 @media (max-width: 900px){
   .grid-cards .card{ grid-column: 1 / -1; }
 }
@@ -173,8 +207,10 @@ a,button{ touch-action:manipulation; }
       <span class="brand-badge" aria-hidden="true"></span>
       <span>QRI- the Quantum Research Institute</span>
     </a>
-    <button class="nav-toggle" aria-label="Menu" onclick="document.getElementById('nav').classList.toggle('open')">Menu</button>
-    <nav class="navlinks">
+
+    <button class="nav-toggle" id="menuBtn" aria-label="Menu" aria-expanded="false" aria-controls="primaryNav">Menu</button>
+
+    <nav class="navlinks" id="primaryNav">
       <a href="/about.html">About</a>
       <a href="/research.html">Research Portal</a>
       <a href="/resources.html">Resources</a>
@@ -182,6 +218,9 @@ a,button{ touch-action:manipulation; }
     </nav>
   </div>
 </header>
+
+<!-- Backdrop for mobile menu -->
+<div class="nav-scrim" id="navScrim" aria-hidden="true"></div>
 
 <section class="hero">
   <div class="container hero-grid">
@@ -272,8 +311,33 @@ a,button{ touch-action:manipulation; }
 </footer>
 
 <script>
-/* simple nav toggle for mobile (if needed later) */
+/* Mobile menu toggle that does not reflow the page */
+const nav    = document.getElementById('nav');
+const btn    = document.getElementById('menuBtn');
+const scrim  = document.getElementById('navScrim');
+
+function closeMenu(){
+  nav.classList.remove('open');
+  document.body.classList.remove('nav-open');
+  btn.setAttribute('aria-expanded','false');
+}
+function toggleMenu(){
+  const willOpen = !nav.classList.contains('open');
+  if(willOpen){
+    nav.classList.add('open');
+    document.body.classList.add('nav-open');
+    btn.setAttribute('aria-expanded','true');
+  }else{
+    closeMenu();
+  }
+}
+btn.addEventListener('click', toggleMenu);
+scrim.addEventListener('click', closeMenu);
+
+/* Close on Escape */
+window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeMenu(); });
 </script>
+
   <!-- Default Statcounter code for QRI analytics
 http://www.QuantumResearchInstitute.com -->
 <script type="text/javascript">
