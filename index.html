@@ -380,12 +380,20 @@ window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeMenu(); })
 </style>
 
 <script>
-  const qriBtn=document.getElementById('qri-toggle');
-  const qriDrawer=document.getElementById('qri-drawer');
-  qriBtn.addEventListener('click',()=>{
-    const open=qriDrawer.classList.toggle('open');
-    qriBtn.setAttribute('aria-expanded',open);
-  });
+  const qriBtn = document.getElementById('qri-toggle');
+  const qriDrawer = document.getElementById('qri-drawer');
+  const qriClose = document.getElementById('qri-close');
+
+  function toggleDrawer(forceOpen){
+    const open = (typeof forceOpen === 'boolean')
+      ? forceOpen
+      : !qriDrawer.classList.contains('open');
+    qriDrawer.classList.toggle('open', open);
+    qriBtn.setAttribute('aria-expanded', open);
+  }
+
+  qriBtn.addEventListener('click', ()=> toggleDrawer());
+  qriClose.addEventListener('click', ()=> toggleDrawer(false));
 </script>
 
   <!-- Default Statcounter code for QRI analytics
