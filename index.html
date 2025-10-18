@@ -6,7 +6,6 @@
 <meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#0b1116">
 <title>QRI - the Quantum Research Institute</title>
-  <!-- Favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -15,205 +14,124 @@
 <style>
 /* ---------- Palette and tokens ---------- */
 :root{
-  --bg: #0b1116;           /* deep blue-black */
-  --bg-2:#0f1720;          /* panel */
-  --ink:#e7edf3;           /* main text */
-  --muted:#b8c4cf;         /* secondary text */
-  --line:#1e2833;          /* borders */
-  --accent:#26d07c;        /* green */
-  --accent-2:#5ac8ff;      /* cyan for subtle glow */
-  --max: 1120px;
-  --radius: 16px;
+  --bg:#0b1116; --bg-2:#0f1720; --ink:#e7edf3; --muted:#b8c4cf; --line:#1e2833;
+  --accent:#26d07c; --accent-2:#5ac8ff; --max:1120px; --radius:16px;
 }
 
 /* ---------- Base ---------- */
-* { box-sizing: border-box; }
-html{ -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{
-  margin:0;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-  background: radial-gradient(1200px 600px at 75% 10%, #0e1822 0%, var(--bg) 65%) no-repeat fixed, var(--bg);
-  color:var(--ink);
-  line-height:1.6;
+  margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+  background:radial-gradient(1200px 600px at 75% 10%, #0e1822 0%, var(--bg) 65%) no-repeat fixed, var(--bg);
+  color:var(--ink);line-height:1.6;
 }
-.container{ max-width:var(--max); margin:0 auto; padding: 0 24px; }
+.container{max-width:var(--max);margin:0 auto;padding:0 24px}
 
 /* ---------- Header / Nav ---------- */
 .site-header{
-  position:sticky; top:0; z-index:10;
-  background: linear-gradient(180deg, rgba(7,11,14,.9), rgba(7,11,14,.6) 70%, rgba(7,11,14,0));
-  border-bottom:1px solid var(--line);
-  backdrop-filter: blur(6px);
+  position:sticky;top:0;z-index:10;background:linear-gradient(180deg,rgba(7,11,14,.9),rgba(7,11,14,.6) 70%,rgba(7,11,14,0));
+  border-bottom:1px solid var(--line);backdrop-filter:blur(6px)
 }
-.nav{
-  display:flex; align-items:center; justify-content:space-between;
-  gap:16px; padding:14px 0;
-  position: relative; /* for the absolute mobile menu */
-}
-.brand{
-  display:flex; align-items:center; gap:12px;
-  color:var(--ink); text-decoration:none; font-weight:700; letter-spacing:.2px;
-}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;position:relative}
+.brand{display:flex;align-items:center;gap:12px;color:var(--ink);text-decoration:none;font-weight:700;letter-spacing:.2px}
 .brand-badge{
-  width:28px; height:28px; border-radius:8px;
-  background:
-    radial-gradient(60% 60% at 35% 35%, rgba(38,208,124,.35), transparent 60%),
-    radial-gradient(60% 60% at 70% 70%, rgba(90,200,255,.25), transparent 60%),
-    #0a2020;
-  border:1px solid #193538;
-  box-shadow: 0 0 0 1px #0c2a30 inset, 0 8px 24px rgba(7, 180, 150, .12);
+  width:28px;height:28px;border-radius:8px;background:
+  radial-gradient(60% 60% at 35% 35%, rgba(38,208,124,.35), transparent 60%),
+  radial-gradient(60% 60% at 70% 70%, rgba(90,200,255,.25), transparent 60%), #0a2020;
+  border:1px solid #193538;box-shadow:0 0 0 1px #0c2a30 inset, 0 8px 24px rgba(7,180,150,.12)
 }
-.navlinks{ display:flex; align-items:center; gap:24px; }
-.navlinks a{
-  color:#d7e2ec; text-decoration:none; padding:8px 10px; border-radius:10px;
-}
-.navlinks a:hover, .navlinks a.active{ background:#111a22; }
-
-.nav-toggle{ display:none; }
+.navlinks{display:flex;align-items:center;gap:24px}
+.navlinks a{color:#d7e2ec;text-decoration:none;padding:8px 10px;border-radius:10px}
+.navlinks a:hover,.navlinks a.active{background:#111a22}
+.nav-toggle{display:none}
 
 /* ---------- Hero ---------- */
-.hero{ padding: 56px 0 28px; position:relative; overflow:hidden; }
-.hero-grid{
-  display:grid; grid-template-columns: 1.15fr .85fr; gap: 24px; align-items:center;
-}
-.kicker{
-  font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#8aa1b4; font-weight:700;
-}
-h1{
-  margin: 6px 0 10px;
-  font-weight: 800;
-  letter-spacing:-0.6px;
-  font-size: clamp(34px, 6.2vw, 64px);
-  line-height:1.05;
-}
-.lead{ color:var(--muted); max-width:62ch; }
-
-.cta-row{ display:flex; flex-wrap:wrap; gap:12px; margin:20px 0 0; }
-.btn{
-  display:inline-flex; align-items:center; gap:10px;
-  padding:12px 16px; border-radius:12px; text-decoration:none; font-weight:700;
-  border:1px solid transparent;
-}
-.btn-primary{
-  background: linear-gradient(180deg, #2fe08c, #19b56f);
-  color:#062015; border-color:#1a7f55;
-  box-shadow: 0 8px 24px rgba(38,208,124,.25);
-}
-.btn-ghost{
-  color:#cfe5f5; background:#0f1820; border-color:#23303c;
-}
-.btn:hover{ transform: translateY(-1px); }
-
-/* Decorative “interference” graphic */
-.hero-art{
-  width:100%; height:320px; display:grid; place-items:center;
-}
-.hero-art svg{ width:min(480px, 90%); height:auto; opacity:.9; filter: drop-shadow(0 10px 30px rgba(0,0,0,.35)); }
+.hero{padding:56px 0 28px;position:relative;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:24px;align-items:center}
+.kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#8aa1b4;font-weight:700}
+h1{margin:6px 0 10px;font-weight:800;letter-spacing:-.6px;font-size:clamp(34px,6.2vw,64px);line-height:1.05}
+.lead{color:var(--muted);max-width:62ch}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin:20px 0 0}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;text-decoration:none;font-weight:700;border:1px solid transparent}
+.btn-primary{background:linear-gradient(180deg,#2fe08c,#19b56f);color:#062015;border-color:#1a7f55;box-shadow:0 8px 24px rgba(38,208,124,.25)}
+.btn-ghost{color:#cfe5f5;background:#0f1820;border-color:#23303c}
+.btn:hover{transform:translateY(-1px)}
+.hero-art{width:100%;height:320px;display:grid;place-items:center}
+.hero-art svg{width:min(480px,90%);height:auto;opacity:.9;filter:drop-shadow(0 10px 30px rgba(0,0,0,.35))}
 
 /* ---------- Welcome band ---------- */
 .band{
-  padding: 28px 0 8px;
-  border-top:1px solid var(--line);
-  background:
-    radial-gradient(900px 220px at 35% 0%, rgba(39,179,255,.08), transparent 70%),
-    radial-gradient(1000px 280px at 85% 30%, rgba(38,208,124,.06), transparent 70%);
+  padding:28px 0 8px;border-top:1px solid var(--line);
+  background:radial-gradient(900px 220px at 35% 0%, rgba(39,179,255,.08), transparent 70%),
+             radial-gradient(1000px 280px at 85% 30%, rgba(38,208,124,.06), transparent 70%)
 }
-.band h2{ margin:0 0 6px; font-size: clamp(20px, 3.2vw, 28px); }
-.band p{ margin:0 0 10px; color:var(--muted); }
+.band h2{margin:0 0 6px;font-size:clamp(20px,3.2vw,28px)}
+.band p{margin:0 0 10px;color:var(--muted)}
 
 /* ---------- Cards ---------- */
-.grid-cards{
-  display:grid; gap:20px; grid-template-columns: repeat(12, 1fr);
-  padding: 22px 0 54px;
-}
-.card{
-  grid-column: span 4;
-  background: linear-gradient(180deg, var(--bg-2), #0c131a);
-  border:1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 18px;
-  box-shadow: 0 8px 24px rgba(0,0,0,.15);
-}
-.card h3{ margin:0 0 6px; font-size: 18px; }
-.card p{ margin:0 0 10px; color:var(--muted); }
-.card a{ color:var(--accent); text-decoration:none; font-weight:700; }
+.grid-cards{display:grid;gap:20px;grid-template-columns:repeat(12,1fr);padding:22px 0 54px}
+.card{grid-column:span 4;background:linear-gradient(180deg,var(--bg-2),#0c131a);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:0 8px 24px rgba(0,0,0,.15)}
+.card h3{margin:0 0 6px;font-size:18px}
+.card p{margin:0 0 10px;color:var(--muted)}
+.card a{color:var(--accent);text-decoration:none;font-weight:700}
 
 /* ---------- Footer ---------- */
-.site-footer{
-  border-top:1px solid var(--line);
-  color:#9ab0bf;
-  font-size:14px;
-  background: #0a0f13;
-}
-.site-footer .row{
-  display:flex; align-items:center; justify-content:space-between;
-  gap:16px; padding:16px 0;
-}
+.site-footer{border-top:1px solid var(--line);color:#9ab0bf;font-size:14px;background:#0a0f13}
+.site-footer .row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 0}
 
 /* ---------- Responsive ---------- */
-@media (max-width: 980px){
-  .hero-grid{ grid-template-columns:1fr; }
-  .hero-art{ height:220px; }
-}
+@media (max-width:980px){.hero-grid{grid-template-columns:1fr}.hero-art{height:220px}}
 
-/* Mobile menu as overlay (no push-down) */
-@media (max-width: 860px){
-  .nav-toggle{
-    display:inline-flex; align-items:center; padding:8px 12px;
-    border-radius:10px; background:#0f1820; color:#cfe5f5; border:1px solid #23303c;
-  }
-
-  @media (max-width: 420px){
-  .qri-drawer{ padding-right: 72px; }
-}
-
-  /* Turn the nav list into an overlay panel */
+@media (max-width:860px){
+  .nav-toggle{display:inline-flex;align-items:center;padding:8px 12px;border-radius:10px;background:#0f1820;color:#cfe5f5;border:1px solid #23303c}
   .navlinks{
-    position:absolute; top:100%; right:0;
-    width:260px; padding:12px 10px; margin:0;
-    background:#0f1820; border:1px solid #23303c; border-radius:12px;
-    box-shadow: 0 12px 28px rgba(0,0,0,.45);
-    list-style:none; gap:8px; flex-direction:column;
-    opacity:0; transform: translateY(-6px);
-    pointer-events:none;
-    z-index:1000;
+    position:absolute;top:100%;right:0;width:260px;padding:12px 10px;margin:0;background:#0f1820;border:1px solid #23303c;border-radius:12px;
+    box-shadow:0 12px 28px rgba(0,0,0,.45);list-style:none;gap:8px;flex-direction:column;opacity:0;transform:translateY(-6px);pointer-events:none;z-index:1000
   }
-  .navlinks a{ display:block; }
-
-  /* Open state */
-  .nav.open .navlinks{
-    opacity:1; transform: translateY(0); pointer-events:auto;
-    transition: transform .18s ease, opacity .18s ease;
-  }
-
-  /* Backdrop */
-  .nav-scrim{
-    position: fixed; inset: 0; background: rgba(0,0,0,.35);
-    z-index:9; display:none;
-  }
-  body.nav-open .nav-scrim{ display:block; }
-
-  /* Prevent scroll when menu open */
-  body.nav-open { overflow:hidden; }
+  .navlinks a{display:block}
+  .nav.open .navlinks{opacity:1;transform:translateY(0);pointer-events:auto;transition:transform .18s ease,opacity .18s ease}
+  .nav-scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9;display:none}
+  body.nav-open .nav-scrim{display:block}
+  body.nav-open{overflow:hidden}
 }
+@media (max-width:900px){.grid-cards .card{grid-column:1 / -1}}
+@media (max-width:420px){.qri-drawer{padding-right:72px}}
+a,button{touch-action:manipulation}
 
-@media (max-width: 900px){
-  .grid-cards .card{ grid-column: 1 / -1; }
+/* ---------- QRI Chat Drawer ---------- */
+.qri-drawer{
+  position:fixed;top:0;right:-100%;width:100%;max-width:420px;height:100vh;background:#0b1116;
+  border-left:1px solid rgba(255,255,255,.08);transition:right .3s ease;z-index:1500;
+  padding:8px 64px 0 0;box-sizing:border-box; /* safe space for Close */
 }
-a,button{ touch-action:manipulation; }
+.qri-drawer.open{right:0}
+.qri-drawer iframe{display:block;width:100%;height:100%;border:0}
+
+/* bubble */
+.qri-toggle{
+  position:fixed;bottom:1rem;right:1rem;z-index:1600;background:#173a2c;color:#e6edf3;border:1px solid rgba(255,255,255,.1);
+  border-radius:50%;width:56px;height:56px;font-size:24px;cursor:pointer
+}
+/* hide bubble when open */
+.qri-drawer.open + #qri-toggle{opacity:0;pointer-events:none;transform:scale(.96)}
+/* Close btn */
+.qri-close{
+  position:absolute;top:10px;right:14px;z-index:1601;width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.15);
+  background:rgba(19,36,48,.9);color:#e6edf3;font-size:20px;line-height:1;cursor:pointer;
+  box-shadow:0 2px 6px rgba(0,0,0,.3);transition:background .2s ease,opacity .18s ease,transform .18s ease
+}
+.qri-close:hover{background:rgba(30,50,64,.95)}
+.qri-drawer:not(.open) .qri-close{opacity:0;pointer-events:none;transform:translateY(-4px)}
+.qri-drawer.open .qri-close{opacity:1;pointer-events:auto;transform:translateY(0)}
 </style>
 </head>
 <body>
 
 <header class="site-header">
   <div class="container nav" id="nav">
-    <a class="brand" href="/">
-      <span class="brand-badge" aria-hidden="true"></span>
-      <span>QRI- the Quantum Research Institute</span>
-    </a>
-
+    <a class="brand" href="/"><span class="brand-badge" aria-hidden="true"></span><span>QRI- the Quantum Research Institute</span></a>
     <button class="nav-toggle" id="menuBtn" aria-label="Menu" aria-expanded="false" aria-controls="primaryNav">Menu</button>
-
     <nav class="navlinks" id="primaryNav">
       <a href="/about.html">About</a>
       <a href="/research.html">Research Portal</a>
@@ -223,7 +141,6 @@ a,button{ touch-action:manipulation; }
   </div>
 </header>
 
-<!-- Backdrop for mobile menu -->
 <div class="nav-scrim" id="navScrim" aria-hidden="true"></div>
 
 <section class="hero">
@@ -231,50 +148,28 @@ a,button{ touch-action:manipulation; }
     <div>
       <div class="kicker">Independent Research</div>
       <h1>Where curiosity<br>becomes structure</h1>
-      <p class="lead">
-        We explore the frontier between imagination, energy, and structure. QRI is a home for serious, open inquiry that turns raw potential into clear results.
-      </p>
+      <p class="lead">We explore the frontier between imagination, energy, and structure. QRI is a home for serious, open inquiry that turns raw potential into clear results.</p>
       <div class="cta-row">
         <a class="btn btn-primary" href="/research.html">Enter the Research Portal</a>
         <a class="btn btn-ghost" href="/about.html">About the Institute</a>
       </div>
     </div>
-
     <div class="hero-art" aria-hidden="true">
-      <!-- Inline SVG: concentric disc + “interference” rays -->
       <svg viewBox="0 0 520 520" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <radialGradient id="g1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(260 260) rotate(90) scale(220 220)">
-            <stop offset="0" stop-color="#0d2a36"/>
-            <stop offset=".6" stop-color="#0d1f2b"/>
-            <stop offset="1" stop-color="#0a131a"/>
+            <stop offset="0" stop-color="#0d2a36"/><stop offset=".6" stop-color="#0d1f2b"/><stop offset="1" stop-color="#0a131a"/>
           </radialGradient>
         </defs>
         <circle cx="260" cy="260" r="220" fill="url(#g1)" stroke="#1b2a35" stroke-opacity=".6"/>
-        <!-- rays -->
         <g stroke="#5ac8ff" stroke-opacity=".35">
-          <!-- Left fan -->
-          <path d="M 60 240 Q 260 260 260 260" />
-          <path d="M 60 220 Q 260 250 260 260" />
-          <path d="M 60 200 Q 260 240 260 260" />
-          <path d="M 60 180 Q 260 230 260 260" />
-          <path d="M 60 160 Q 260 220 260 260" />
-          <path d="M 60 140 Q 260 210 260 260" />
-          <path d="M 60 120 Q 260 200 260 260" />
-          <path d="M 60 100 Q 260 190 260 260" />
-          <path d="M 60 80  Q 260 180 260 260" />
-          <path d="M 60 60  Q 260 170 260 260" />
-          <!-- Right fan -->
-          <path d="M 460 240 Q 260 260 260 260" />
-          <path d="M 460 220 Q 260 270 260 260" />
-          <path d="M 460 200 Q 260 280 260 260" />
-          <path d="M 460 180 Q 260 290 260 260" />
-          <path d="M 460 160 Q 260 300 260 260" />
-          <path d="M 460 140 Q 260 310 260 260" />
-          <path d="M 460 120 Q 260 320 260 260" />
-          <path d="M 460 100 Q 260 330 260 260" />
-          <path d="M 460 80  Q 260 340 260 260" />
-          <path d="M 460 60  Q 260 350 260 260" />
+          <path d="M 60 240 Q 260 260 260 260" /><path d="M 60 220 Q 260 250 260 260" /><path d="M 60 200 Q 260 240 260 260" />
+          <path d="M 60 180 Q 260 230 260 260" /><path d="M 60 160 Q 260 220 260 260" /><path d="M 60 140 Q 260 210 260 260" />
+          <path d="M 60 120 Q 260 200 260 260" /><path d="M 60 100 Q 260 190 260 260" /><path d="M 60 80 Q 260 180 260 260" />
+          <path d="M 60 60 Q 260 170 260 260" /><path d="M 460 240 Q 260 260 260 260" /><path d="M 460 220 Q 260 270 260 260" />
+          <path d="M 460 200 Q 260 280 260 260" /><path d="M 460 180 Q 260 290 260 260" /><path d="M 460 160 Q 260 300 260 260" />
+          <path d="M 460 140 Q 260 310 260 260" /><path d="M 460 120 Q 260 320 260 260" /><path d="M 460 100 Q 260 330 260 260" />
+          <path d="M 460 80 Q 260 340 260 260" /><path d="M 460 60 Q 260 350 260 260" />
         </g>
       </svg>
     </div>
@@ -286,23 +181,10 @@ a,button{ touch-action:manipulation; }
     <h2>Welcome to QRI</h2>
     <p><strong>Quantum Research Institute</strong> is a space for independent thinkers and curious minds. Ideas take form here. Our <strong>Research Portal</strong> connects aspiring theorists with the tools, resources, and discussions that help turn questions into testable structure.</p>
     <p>Whether you are refining a concept or preparing a paper, this is where potential becomes defined.</p>
-
     <div class="grid-cards">
-      <article class="card">
-        <h3>Research Portal</h3>
-        <p>Guides, templates, literature links, and peer input. Everything you need to formalize and share work with clarity.</p>
-        <p><a href="/research.html">Enter the portal →</a></p>
-      </article>
-      <article class="card">
-        <h3>Resources</h3>
-        <p>Curated references, toolchains, and learning paths that support serious exploration without gatekeeping.</p>
-        <p><a href="/resources.html">Browse resources →</a></p>
-      </article>
-      <article class="card">
-        <h3>About</h3>
-        <p>Who we are, what we value, and how the Institute serves as a gateway for curious minds.</p>
-        <p><a href="/about.html">Read more →</a></p>
-      </article>
+      <article class="card"><h3>Research Portal</h3><p>Guides, templates, literature links, and peer input. Everything you need to formalize and share work with clarity.</p><p><a href="/research.html">Enter the portal →</a></p></article>
+      <article class="card"><h3>Resources</h3><p>Curated references, toolchains, and learning paths that support serious exploration without gatekeeping.</p><p><a href="/resources.html">Browse resources →</a></p></article>
+      <article class="card"><h3>About</h3><p>Who we are, what we value, and how the Institute serves as a gateway for curious minds.</p><p><a href="/about.html">Read more →</a></p></article>
     </div>
   </div>
 </section>
@@ -310,125 +192,57 @@ a,button{ touch-action:manipulation; }
 <footer class="site-footer">
   <div class="container row">
     <small>© 2025 Quantum Research Institute, Princeton, TX USA</small>
-    <a href="/contact.html" style="color:#9ab0bf; text-decoration:none;">Contact</a>
+    <a href="/contact.html" style="color:#9ab0bf;text-decoration:none">Contact</a>
   </div>
 </footer>
 
+<!-- Mobile menu -->
 <script>
-/* Mobile menu toggle that does not reflow the page */
-const nav    = document.getElementById('nav');
-const btn    = document.getElementById('menuBtn');
-const scrim  = document.getElementById('navScrim');
-
-function closeMenu(){
-  nav.classList.remove('open');
-  document.body.classList.remove('nav-open');
-  btn.setAttribute('aria-expanded','false');
-}
-function toggleMenu(){
-  const willOpen = !nav.classList.contains('open');
-  if(willOpen){
-    nav.classList.add('open');
-    document.body.classList.add('nav-open');
-    btn.setAttribute('aria-expanded','true');
-  }else{
-    closeMenu();
-  }
-}
-btn.addEventListener('click', toggleMenu);
-scrim.addEventListener('click', closeMenu);
-
-/* Close on Escape */
-window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeMenu(); });
+const nav = document.getElementById('nav');
+const btn = document.getElementById('menuBtn');
+const scrim = document.getElementById('navScrim');
+function closeMenu(){nav.classList.remove('open');document.body.classList.remove('nav-open');btn.setAttribute('aria-expanded','false')}
+function toggleMenu(){const willOpen=!nav.classList.contains('open');if(willOpen){nav.classList.add('open');document.body.classList.add('nav-open');btn.setAttribute('aria-expanded','true')}else{closeMenu()}}
+btn.addEventListener('click',toggleMenu);scrim.addEventListener('click',closeMenu);
+window.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
 </script>
 
 <!-- QRI Chat Drawer -->
 <div id="qri-drawer" class="qri-drawer">
   <button id="qri-close" class="qri-close" aria-label="Close chat">✕</button>
-  <!-- start blank; only set src on first open so Statcounter logs a pageview -->
+  <!-- lazy: only set src on first open so Statcounter logs a pageview -->
   <iframe id="qri-frame" src="about:blank" data-src="/chat.html?from=drawer" title="QRI Guide" loading="lazy"></iframe>
 </div>
 <button id="qri-toggle" class="qri-toggle" aria-controls="qri-drawer" aria-expanded="false">💬Queri</button>
 
-<style>
-.qri-drawer{
-  position: fixed;
-  top: 0; right: -100%;
-  width: 100%; max-width: 420px; height: 100vh;
-  background: #0b1116;
-  border-left: 1px solid rgba(255,255,255,.08);
-  transition: right .3s ease;
-  z-index: 1500;
-
-  /* NEW: create safe space for the close button */
-  padding: 8px 64px 0 0;   /* top | right | bottom | left */
-  box-sizing: border-box;  /* so padding doesn't blow up width */
-}
-.qri-drawer.open{ right:0 }
-
-/* make the iframe respect the drawer padding and fill nicely */
-.qri-drawer iframe{
-  display: block;
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
-
-
-/* floating bubble */
-.qri-toggle{
-  position:fixed;bottom:1rem;right:1rem;z-index:1600;
-  background:#173a2c;color:#e6edf3;border:1px solid rgba(255,255,255,.1);
-  border-radius:50%;width:56px;height:56px;font-size:24px;cursor:pointer;
-}
-
-/* HIDE the bubble when drawer is open */
-.qri-drawer.open + #qri-toggle{
-  opacity:0; pointer-events:none; transform:scale(0.96);
-}
-
-/* Close button inside drawer */
-.qri-close{
-  position: absolute;
-  top: 10px;
-  right: 14px;           /* moved inward so it won’t sit over “Export” */
-  z-index: 1601;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(19,36,48,0.9);
-  color: #e6edf3;
-  font-size: 20px;
-  line-height: 1;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  transition: background 0.2s ease, opacity .18s ease, transform .18s ease;
-}
-.qri-close:hover{ background: rgba(30,50,64,0.95); }
-  
-.qri-drawer:not(.open) .qri-close{ opacity: 0; pointer-events: none; transform: translateY(-4px); }
-.qri-drawer.open .qri-close{ opacity: 1; pointer-events: auto; transform: translateY(0); }
-
-</style>
-
 <script>
-  const qriBtn    = document.getElementById('qri-toggle');
-  const qriDrawer = document.getElementById('qri-drawer');
-  const qriClose  = document.getElementById('qri-close');
-  const qriFrame  = document.getElementById('qri-frame');
+  const qriBtn   = document.getElementById('qri-toggle');
+  const qriDrawer= document.getElementById('qri-drawer');
+  const qriClose = document.getElementById('qri-close');
+  const qriFrame = document.getElementById('qri-frame');
+
+  let qriHasLoaded = false;
+
+  function statcounterBeacon(label){
+    // parent-side beacon guarantees a log even if iframe blocks scripts
+    const i = new Image();
+    // Project 13176686, security 1c58bc44 (same as your site snippet)
+    i.src = "https://c.statcounter.com/13176686/0/1c58bc44/1/?title=" + encodeURIComponent(label);
+  }
 
   function toggleDrawer(forceOpen){
-    const open = (typeof forceOpen === 'boolean')
-      ? forceOpen
-      : !qriDrawer.classList.contains('open');
-
+    const open = (typeof forceOpen === 'boolean') ? forceOpen : !qriDrawer.classList.contains('open');
     qriDrawer.classList.toggle('open', open);
     qriBtn.setAttribute('aria-expanded', open);
 
-    // NEW: first-open lazy load -> this triggers Statcounter pageview
-    if (open && qriFrame && qriFrame.src === 'about:blank') {
-      qriFrame.src = qriFrame.dataset.src;
+    // first-open: load iframe + send a Statcounter beacon
+    if (open && !qriHasLoaded) {
+      const currentSrc = qriFrame ? qriFrame.getAttribute('src') : null;
+      if (qriFrame && (!currentSrc || currentSrc === 'about:blank')) {
+        qriFrame.src = qriFrame.dataset.src || "/chat.html?from=drawer";
+      }
+      statcounterBeacon("QRI Chat Open");
+      qriHasLoaded = true;
     }
   }
 
@@ -436,5 +250,6 @@ window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeMenu(); })
   qriClose.addEventListener('click', ()=> toggleDrawer(false));
 </script>
 
+<!-- (Your main Statcounter snippet can remain on this page if you want) -->
 </body>
 </html>
