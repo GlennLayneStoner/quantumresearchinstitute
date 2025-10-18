@@ -1,17 +1,13 @@
-// Vercel Edge Function with CORS + OPTIONS support
+// /api/qri-chat.js  — Vercel Edge Function with CORS + friendly errors
 export const config = { runtime: "edge" };
 
 export default async function handler(request) {
-  // 1) Handle CORS preflight
   if (request.method === "OPTIONS") {
     return new Response("", { status: 200, headers: cors() });
   }
-
-  // 2) Only allow POST for the real call
   if (request.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Use POST" }), {
-      status: 405,
-      headers: cors(),
+    return new Response(JSON.stringify({ role:"assistant", content:"Use POST." }), {
+      status: 405, headers: cors(),
     });
   }
 
@@ -34,23 +30,30 @@ export default async function handler(request) {
     });
 
     if (!r.ok) {
-      const t = await r.text(); // helpful for debugging in Vercel logs
-      return new Response(JSON.stringify({ error: "OpenAI error", detail: t }), {
-        status: 500,
-        headers: cors(),
-      });
+      const t = await r.text();
+      return new Response(JSON.stringify({
+        role: "assistant",
+        content: "Sorry—my backend couldn’t complete the request. (OpenAI API error.)",
+        detail: t,
+      }), { status: 500, headers: cors() });
     }
 
     const data = await r.json();
-    return new Response(JSON.stringify(data.choices[0].message), {
-      status: 200,
-      headers: cors(),
-    });
+    const msg = data?.choices?.[0]?.message;
+    if (!msg?.content) {
+      return new Response(JSON.stringify({
+        role: "assistant",
+        content: "I didn’t receive a completion from the model. Try again.",
+      }), { status: 200, headers: cors() });
+    }
+
+    return new Response(JSON.stringify(msg), { status: 200, headers: cors() });
   } catch (e) {
-    return new Response(JSON.stringify({ error: "Bad request", detail: String(e) }), {
-      status: 400,
-      headers: cors(),
-    });
+    return new Response(JSON.stringify({
+      role: "assistant",
+      content: "Bad request — I couldn’t parse what was sent to me.",
+      detail: String(e),
+    }), { status: 400, headers: cors() });
   }
 }
 
