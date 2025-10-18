@@ -338,6 +338,39 @@ scrim.addEventListener('click', closeMenu);
 window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeMenu(); });
 </script>
 
+ <!-- QRI Chat Drawer -->
+<div id="qri-drawer" class="qri-drawer">
+  <iframe src="/chat.html" title="QRI Guide" loading="lazy"></iframe>
+</div>
+<button id="qri-toggle" class="qri-toggle" aria-controls="qri-drawer" aria-expanded="false">💬 QRI Guide</button>
+
+<style>
+  .qri-drawer{
+    position:fixed;top:0;right:-100%;width:100%;max-width:420px;height:100vh;
+    background:#0b1116;border-left:1px solid rgba(255,255,255,.08);
+    transition:right .3s ease;z-index:1500;
+  }
+  .qri-drawer.open{right:0}
+  .qri-drawer iframe{width:100%;height:100%;border:0}
+  .qri-toggle{
+    position:fixed;bottom:1rem;right:1rem;z-index:1600;
+    background:#173a2c;color:#e6edf3;border:1px solid rgba(255,255,255,.1);
+    border-radius:50%;width:56px;height:56px;font-size:24px;cursor:pointer;
+  }
+  @media(max-width:500px){
+    .qri-drawer{max-width:100%}
+  }
+</style>
+
+<script>
+  const qriBtn=document.getElementById('qri-toggle');
+  const qriDrawer=document.getElementById('qri-drawer');
+  qriBtn.addEventListener('click',()=>{
+    const open=qriDrawer.classList.toggle('open');
+    qriBtn.setAttribute('aria-expanded',open);
+  });
+</script>
+
   <!-- Default Statcounter code for QRI analytics
 http://www.QuantumResearchInstitute.com -->
 <script type="text/javascript">
