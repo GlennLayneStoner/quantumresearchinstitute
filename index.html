@@ -228,7 +228,7 @@ a,button{ touch-action:manipulation; }
       <div class="kicker">Independent Research</div>
       <h1>Where curiosity<br>becomes structure</h1>
       <p class="lead">
-        We explore the frontier between information, energy, and structure. QRI is a home for serious, open inquiry that turns raw potential into clear results.
+        We explore the frontier between imagination, energy, and structure. QRI is a home for serious, open inquiry that turns raw potential into clear results.
       </p>
       <div class="cta-row">
         <a class="btn btn-primary" href="/research.html">Enter the Research Portal</a>
@@ -368,14 +368,26 @@ window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeMenu(); })
 
 /* Close button inside drawer */
 .qri-close{
-  position:absolute;top:8px;right:8px;z-index:1601;
-  width:40px;height:40px;border-radius:10px;border:1px solid rgba(255,255,255,.12);
-  background:#132430;color:#e6edf3;font-size:20px;line-height:1;cursor:pointer;
+  position: absolute;
+  top: 10px;
+  right: 14px;           /* moved inward so it won’t sit over “Export” */
+  z-index: 1601;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(19,36,48,0.9);
+  color: #e6edf3;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  transition: background 0.2s ease, opacity .18s ease, transform .18s ease;
 }
-
-@media(max-width:500px){
-  .qri-drawer{max-width:100%}
-}
+.qri-close:hover{ background: rgba(30,50,64,0.95); }
+  
+.qri-drawer:not(.open) .qri-close{ opacity: 0; pointer-events: none; transform: translateY(-4px); }
+.qri-drawer.open .qri-close{ opacity: 1; pointer-events: auto; transform: translateY(0); }
 
 </style>
 
@@ -396,7 +408,7 @@ window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeMenu(); })
   qriClose.addEventListener('click', ()=> toggleDrawer(false));
 </script>
 
-  <!-- Default Statcounter code for QRI analytics
+  <!-- Defdefault Statcounter code for QRI analytics
 http://www.QuantumResearchInstitute.com -->
 <script type="text/javascript">
 var sc_project=13176686; 
