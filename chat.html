@@ -247,5 +247,32 @@ document.getElementById('exportBtn').addEventListener('click', ()=>{
   URL.revokeObjectURL(url);
 });
 </script>
+<script>
+  // after your send button handler resolves, ping a lightweight beacon
+  function trackSend(){
+    // creates a throwaway image request so it logs as an additional pageview labeled "QRI Chat Send"
+    const i = new Image();
+    i.src = "https://c.statcounter.com/13176686/0/1c58bc44/1/?title=" + encodeURIComponent("QRI Chat Send");
+  }
+  // call trackSend() at the end of your send handler (only on successful submit)
+</script>
+
+  <script>
+  // Make the page title clear in Statcounter logs
+  document.title = "QRI Chat Drawer";
+</script>
+
+<!-- Statcounter for the chat iframe -->
+<script type="text/javascript">
+  var sc_project=13176686;
+  var sc_invisible=1;
+  var sc_security="1c58bc44";
+  var sc_remove_link=1; // keeps the badge/link hidden
+</script>
+<script async type="text/javascript" src="https://www.statcounter.com/counter/counter.js"></script>
+<noscript>
+  <img class="statcounter" src="https://c.statcounter.com/13176686/0/1c58bc44/1/" alt="statcounter">
+</noscript>
+
 </body>
 </html>
