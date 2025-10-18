@@ -345,7 +345,8 @@ window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeMenu(); })
 <!-- QRI Chat Drawer -->
 <div id="qri-drawer" class="qri-drawer">
   <button id="qri-close" class="qri-close" aria-label="Close chat">✕</button>
-  <iframe src="/chat.html" title="QRI Guide" loading="lazy"></iframe>
+  <!-- start blank; only set src on first open so Statcounter logs a pageview -->
+  <iframe id="qri-frame" src="about:blank" data-src="/chat.html?from=drawer" title="QRI Guide" loading="lazy"></iframe>
 </div>
 <button id="qri-toggle" class="qri-toggle" aria-controls="qri-drawer" aria-expanded="false">💬Queri</button>
 
@@ -412,40 +413,28 @@ window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeMenu(); })
 </style>
 
 <script>
-  const qriBtn = document.getElementById('qri-toggle');
+  const qriBtn    = document.getElementById('qri-toggle');
   const qriDrawer = document.getElementById('qri-drawer');
-  const qriClose = document.getElementById('qri-close');
+  const qriClose  = document.getElementById('qri-close');
+  const qriFrame  = document.getElementById('qri-frame');
 
   function toggleDrawer(forceOpen){
     const open = (typeof forceOpen === 'boolean')
       ? forceOpen
       : !qriDrawer.classList.contains('open');
+
     qriDrawer.classList.toggle('open', open);
     qriBtn.setAttribute('aria-expanded', open);
+
+    // NEW: first-open lazy load -> this triggers Statcounter pageview
+    if (open && qriFrame && qriFrame.src === 'about:blank') {
+      qriFrame.src = qriFrame.dataset.src;
+    }
   }
 
   qriBtn.addEventListener('click', ()=> toggleDrawer());
   qriClose.addEventListener('click', ()=> toggleDrawer(false));
 </script>
 
-  <!-- Defdefault Statcounter code for QRI analytics
-<script>
-  // Make the page title clear in Statcounter logs
-  document.title = "QRI Chat Drawer";
-</script>
-
-<!-- Statcounter for the chat iframe -->
-<script type="text/javascript">
-  var sc_project=13176686;
-  var sc_invisible=1;
-  var sc_security="1c58bc44";
-  var sc_remove_link=1; // keeps the badge/link hidden
-</script>
-<script async type="text/javascript" src="https://www.statcounter.com/counter/counter.js"></script>
-<noscript>
-  <img class="statcounter" src="https://c.statcounter.com/13176686/0/1c58bc44/1/" alt="statcounter">
-</noscript>
-
-<!-- End of Statcounter Code -->
 </body>
 </html>
