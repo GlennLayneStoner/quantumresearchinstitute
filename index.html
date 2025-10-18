@@ -429,21 +429,23 @@ window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeMenu(); })
 </script>
 
   <!-- Defdefault Statcounter code for QRI analytics
-http://www.QuantumResearchInstitute.com -->
-<script type="text/javascript">
-var sc_project=13176686; 
-var sc_invisible=1; 
-var sc_security="1c58bc44"; 
+<script>
+  // Make the page title clear in Statcounter logs
+  document.title = "QRI Chat Drawer";
 </script>
-<script type="text/javascript"
-src="https://www.statcounter.com/counter/counter.js"
-async></script>
-<noscript><div class="statcounter"><a title="Web Analytics"
-href="https://statcounter.com/" target="_blank"><img
-class="statcounter"
-src="https://c.statcounter.com/13176686/0/1c58bc44/1/"
-alt="Web Analytics"
-referrerPolicy="no-referrer-when-downgrade"></a></div></noscript>
+
+<!-- Statcounter for the chat iframe -->
+<script type="text/javascript">
+  var sc_project=13176686;
+  var sc_invisible=1;
+  var sc_security="1c58bc44";
+  var sc_remove_link=1; // keeps the badge/link hidden
+</script>
+<script async type="text/javascript" src="https://www.statcounter.com/counter/counter.js"></script>
+<noscript>
+  <img class="statcounter" src="https://c.statcounter.com/13176686/0/1c58bc44/1/" alt="statcounter">
+</noscript>
+
 <!-- End of Statcounter Code -->
 </body>
 </html>
