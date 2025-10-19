@@ -5,67 +5,54 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#0b1116">
-<title>About — QRI</title>
+<title>About QRI — Theory-neutral research support</title>
+
+<link rel="canonical" href="https://www.quantumresearchinstitute.com/about.html">
+
+<!-- Meta description -->
+<meta name="description" content="QRI is theory neutral. We support independent researchers with structure, resources, and AI-assisted review without endorsing specific theories.">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Quantum Research Institute">
+<meta property="og:title" content="About QRI — Theory-neutral research support">
+<meta property="og:description" content="QRI provides structure, resources, and AI-assisted review with theory neutrality.">
+<meta property="og:url" content="https://www.quantumresearchinstitute.com/about.html">
+<meta property="og:image" content="https://www.quantumresearchinstitute.com/og-image.jpg">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="About QRI — Theory-neutral research support">
+<meta name="twitter:description" content="QRI provides structure, resources, and AI-assisted review with theory neutrality.">
+<meta name="twitter:image" content="https://www.quantumresearchinstitute.com/og-image.jpg">
+
 <!-- Favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="shortcut icon" href="/favicon.ico">
+
 <style>
 /* ---------- Responsive nav ---------- */
 .site-header .nav { position: relative; }
-
 @media (max-width: 980px){
-  .nav-toggle{
-    display:inline-flex; align-items:center; gap:8px;
-    padding:8px 12px; border-radius:10px;
-    background:#0f1820; color:#cfe5f5; border:1px solid #23303c;
-  }
-  .navlinks{
-    display:none; position:absolute; top:100%; right:24px; z-index:20;
-    flex-direction:column; gap:6px; padding:8px;
-    width:min(260px, calc(100vw - 48px));
-    background:#0f1720; border:1px solid var(--line); border-radius:12px;
-    box-shadow:0 12px 30px rgba(0,0,0,.35);
-  }
+  .nav-toggle{ display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:10px; background:#0f1820; color:#cfe5f5; border:1px solid #23303c; }
+  .navlinks{ display:none; position:absolute; top:100%; right:24px; z-index:20; flex-direction:column; gap:6px; padding:8px; width:min(260px, calc(100vw - 48px)); background:#0f1720; border:1px solid var(--line); border-radius:12px; box-shadow:0 12px 30px rgba(0,0,0,.35); }
   .nav.open .navlinks{ display:flex; }
   .navlinks a{ padding:10px 12px; border-radius:10px; }
   .navlinks a:hover{ background:#111a22; }
 }
-
-@media (min-width: 981px){
-  .nav-toggle{ display:none; }
-}
+@media (min-width: 981px){ .nav-toggle{ display:none; } }
 
 /* ---------- Base styling ---------- */
-:root{
-  --bg:#0b1116;--bg-2:#0f1720;--ink:#e7edf3;--muted:#b8c4cf;
-  --line:#1e2833;--accent:#26d07c;--accent-2:#5ac8ff;
-  --radius:16px;--max:1120px;
-}
+:root{ --bg:#0b1116;--bg-2:#0f1720;--ink:#e7edf3;--muted:#b8c4cf; --line:#1e2833;--accent:#26d07c;--accent-2:#5ac8ff; --radius:16px;--max:1120px; }
 *{box-sizing:border-box;}
-body{
-  margin:0;
-  font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-  background:radial-gradient(1200px 600px at 75% 10%,#0e1822 0%,var(--bg) 65%) no-repeat fixed,var(--bg);
-  color:var(--ink); line-height:1.6;
-}
+body{ margin:0; font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; background:radial-gradient(1200px 600px at 75% 10%,#0e1822 0%,var(--bg) 65%) no-repeat fixed,var(--bg); color:var(--ink); line-height:1.6; }
 .container{max-width:var(--max);margin:0 auto;padding:0 24px;}
-.site-header{
-  position:sticky;top:0;z-index:10;
-  background:linear-gradient(180deg,rgba(7,11,14,.9),rgba(7,11,14,.6) 70%,rgba(7,11,14,0));
-  border-bottom:1px solid var(--line);
-  backdrop-filter:blur(6px);
-}
+.site-header{ position:sticky;top:0;z-index:10; background:linear-gradient(180deg,rgba(7,11,14,.9),rgba(7,11,14,.6) 70%,rgba(7,11,14,0)); border-bottom:1px solid var(--line); backdrop-filter:blur(6px); }
 .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;}
 .brand{display:flex;align-items:center;gap:12px;color:var(--ink);text-decoration:none;font-weight:700;}
-.brand-badge{
-  width:28px;height:28px;border-radius:8px;
-  background:radial-gradient(60% 60% at 35% 35%,rgba(38,208,124,.35),transparent 60%),
-             radial-gradient(60% 60% at 70% 70%,rgba(90,200,255,.25),transparent 60%),#0a2020;
-  border:1px solid #193538;
-  box-shadow:0 0 0 1px #0c2a30 inset,0 8px 24px rgba(7,180,150,.12);
-}
+.brand-badge{ width:28px;height:28px;border-radius:8px; background:radial-gradient(60% 60% at 35% 35%,rgba(38,208,124,.35),transparent 60%), radial-gradient(60% 60% at 70% 70%,rgba(90,200,255,.25),transparent 60%),#0a2020; border:1px solid #193538; box-shadow:0 0 0 1px #0c2a30 inset,0 8px 24px rgba(7,180,150,.12); }
 .navlinks{display:flex;align-items:center;gap:24px;}
 .navlinks a{color:#d7e2ec;text-decoration:none;padding:8px 10px;border-radius:10px;}
 .navlinks a:hover,.navlinks a.active{background:#111a22;}
@@ -81,12 +68,8 @@ p{color:var(--muted);margin:8px 0 14px;}
 ul{color:var(--muted);margin:8px 0 14px;}
 
 /* ---------- Footer ---------- */
-footer{
-  border-top:1px solid var(--line);
-  color:#9ab0bf;font-size:14px;background:#0a0f13;
-}
+footer{ border-top:1px solid var(--line); color:#9ab0bf;font-size:14px;background:#0a0f13; }
 footer .row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 0;}
-/* HOTFIX: ensure mobile dropdown is hidden until opened */
 @media (max-width: 980px){
   .site-header .nav .navlinks{ display: none !important; }
   .site-header .nav.open .navlinks{ display: flex !important; }
@@ -148,7 +131,7 @@ footer .row{display:flex;align-items:center;justify-content:space-between;gap:16
     <p>Science belongs to everyone willing to think with precision. At QRI, curiosity is the raw material. Structure is the result.</p>
   </section>
 
-  <!-- NEW: Theory Neutrality -->
+  <!-- Theory Neutrality -->
   <section class="section">
     <h2>Theory Neutrality</h2>
     <p>QRI is <strong>theory neutral</strong>. We provide resources, guidance, and AI-assisted review to help individuals formalize their ideas, and we do not endorse, validate, or reject any theory developed through this platform.</p>
