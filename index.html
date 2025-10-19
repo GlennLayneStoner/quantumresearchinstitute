@@ -6,10 +6,61 @@
 <meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#0b1116">
 <title>QRI - the Quantum Research Institute</title>
+
+<!-- Canonical -->
+<link rel="canonical" href="https://www.quantumresearchinstitute.com/">
+
+<!-- Favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="shortcut icon" href="/favicon.ico">
+
+<!-- Meta description -->
+<meta name="description" content="Quantum Research Institute (QRI) helps independent researchers turn curiosity into structure. Explore quantum physics, thermodynamics, and cosmology with resources, a research portal, and AI-assisted peer review — all with theory neutrality.">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Quantum Research Institute">
+<meta property="og:title" content="QRI — Where curiosity becomes structure">
+<meta property="og:description" content="Theory-neutral tools, resources, and AI-assisted peer review for independent researchers.">
+<meta property="og:url" content="https://www.quantumresearchinstitute.com/">
+<meta property="og:image" content="https://www.quantumresearchinstitute.com/og-image.jpg">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="QRI — Where curiosity becomes structure">
+<meta name="twitter:description" content="Theory-neutral tools, resources, and AI-assisted peer review for independent researchers.">
+<meta name="twitter:image" content="https://www.quantumresearchinstitute.com/og-image.jpg">
+
+<!-- JSON-LD: Organization -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Quantum Research Institute",
+  "url": "https://www.quantumresearchinstitute.com/",
+  "logo": "https://www.quantumresearchinstitute.com/apple-touch-icon.png",
+  "sameAs": [
+    "https://zenodo.org/communities/quantumresearchinstitute"
+  ]
+}
+</script>
+
+<!-- JSON-LD: Website (search is optional; keep for future) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "url": "https://www.quantumresearchinstitute.com/",
+  "name": "Quantum Research Institute",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://www.quantumresearchinstitute.com/search.html?q={query}",
+    "query-input": "required name=query"
+  }
+}
+</script>
 
 <style>
 /* ---------- Palette and tokens ---------- */
@@ -162,6 +213,8 @@ a,button{touch-action:manipulation}
 </head>
 <body>
 
+<noscript><a href="#main" style="position:absolute;left:-9999px;">Skip to content</a></noscript>
+
 <!-- Splash Cover -->
 <div id="qri-splash" class="splash" role="dialog" aria-modal="true" aria-label="Welcome">
   <div class="splash-card">
@@ -269,9 +322,7 @@ window.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
   let qriHasLoaded = false;
 
   function statcounterBeacon(label){
-    // parent-side beacon guarantees a log even if iframe blocks scripts
     const i = new Image();
-    // Project 13176686, security 1c58bc44
     i.src = "https://c.statcounter.com/13176686/0/1c58bc44/1/?title=" + encodeURIComponent(label);
   }
 
@@ -280,7 +331,6 @@ window.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
     qriDrawer.classList.toggle('open', open);
     qriBtn.setAttribute('aria-expanded', open);
 
-    // first-open: load iframe + send a Statcounter beacon
     if (open && !qriHasLoaded) {
       const currentSrc = qriFrame ? qriFrame.getAttribute('src') : null;
       if (qriFrame && (!currentSrc || currentSrc === 'about:blank')) {
@@ -295,14 +345,13 @@ window.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
   qriClose.addEventListener('click', ()=> toggleDrawer(false));
 </script>
 
-<!-- Splash logic -->
+<!-- Splash logic (with testing controls: ?splash=show|reset|off) -->
 <script>
 (function(){
   const splash = document.getElementById('qri-splash');
   const skip   = document.getElementById('qri-skip');
   if(!splash) return;
 
-  // --- helpers ---
   const params = new URLSearchParams(location.search);
   const cmd = (params.get('splash') || '').toLowerCase();  // show | reset | off
   const LS_KEY_DAY = 'qriSplashSeenAt';
@@ -313,19 +362,14 @@ window.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
   const seenDay = Number(localStorage.getItem(LS_KEY_DAY) || 0);
   const seenSession = sessionStorage.getItem(SS_KEY_SEEN) === '1';
 
-  // --- URL overrides for testing ---
   if (cmd === 'off') { splash.remove(); return; }
   if (cmd === 'reset') { localStorage.removeItem(LS_KEY_DAY); sessionStorage.removeItem(SS_KEY_SEEN); }
 
-  // show logic:
-  // - force show if ?splash=show
-  // - else show if not seen this session AND not seen in last 24h
   const forceShow = cmd === 'show';
   const showByDay = !seenDay || (now - seenDay) > DAY;
   const showBySession = !seenSession;
   const shouldShow = forceShow || (showBySession && showByDay);
 
-  // local beacon (Statcounter)
   function scBeacon(label){
     try{
       const i = new Image();
@@ -337,7 +381,6 @@ window.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
   }
 
   function hideSplash(){
-    // mark seen for session + day
     sessionStorage.setItem(SS_KEY_SEEN, '1');
     localStorage.setItem(LS_KEY_DAY, String(Date.now()));
     splash.classList.add('hidden');
@@ -346,22 +389,19 @@ window.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
   }
 
   if (shouldShow) {
-    // ensure it actually paints before starting timers (mobile Safari friendly)
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     scBeacon(forceShow ? "Splash Shown (force)" : "Splash Shown");
 
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const delay = prefersReduced ? 1200 : 2000; // slightly longer so you can see it on phone
+    const delay = prefersReduced ? 1200 : 2000;
 
-    // wait for next frame so the DOM paints first
     requestAnimationFrame(()=>{
       const timer = setTimeout(()=>{
         hideSplash();
         document.body.style.overflow = prevOverflow;
       }, delay);
 
-      // Skip button
       skip.addEventListener('click', (e)=>{
         e.preventDefault();
         clearTimeout(timer);
@@ -370,7 +410,6 @@ window.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
         const main = document.getElementById('main'); if(main){ main.setAttribute('tabindex','-1'); main.focus(); }
       }, { once:true });
 
-      // Dismiss on any key press (useful on desktop)
       window.addEventListener('keydown', ()=>{
         clearTimeout(timer);
         hideSplash();
@@ -378,7 +417,6 @@ window.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
       }, { once:true });
     });
   } else {
-    // do not flash: remove before layout/paint
     splash.remove();
   }
 })();
