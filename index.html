@@ -158,10 +158,20 @@ a,button{touch-action:manipulation}
 @media (prefers-reduced-motion: reduce){
   .splash{ transition: none; }
 }
-
 </style>
 </head>
 <body>
+
+<!-- Splash Cover -->
+<div id="qri-splash" class="splash" role="dialog" aria-modal="true" aria-label="Welcome">
+  <div class="splash-card">
+    <div class="splash-badge" aria-hidden="true"></div>
+    <div class="tag">Quantum Research Institute</div>
+    <h1>Where curiosity becomes structure</h1>
+    <p>Guided by curiosity. Grounded in theory neutrality.</p>
+    <a href="#main" class="skip" id="qri-skip">Skip</a>
+  </div>
+</div>
 
 <header class="site-header">
   <div class="container nav" id="nav">
@@ -178,7 +188,7 @@ a,button{touch-action:manipulation}
 
 <div class="nav-scrim" id="navScrim" aria-hidden="true"></div>
 
-<section class="hero">
+<section class="hero" id="main">
   <div class="container hero-grid">
     <div>
       <div class="kicker">Independent Research</div>
@@ -261,7 +271,7 @@ window.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
   function statcounterBeacon(label){
     // parent-side beacon guarantees a log even if iframe blocks scripts
     const i = new Image();
-    // Project 13176686, security 1c58bc44 (same as your site snippet)
+    // Project 13176686, security 1c58bc44
     i.src = "https://c.statcounter.com/13176686/0/1c58bc44/1/?title=" + encodeURIComponent(label);
   }
 
@@ -285,11 +295,70 @@ window.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
   qriClose.addEventListener('click', ()=> toggleDrawer(false));
 </script>
 
+<!-- Splash logic -->
+<script>
+(function(){
+  const splash = document.getElementById('qri-splash');
+  const skip   = document.getElementById('qri-skip');
+  if(!splash) return;
+
+  const KEY = 'qriSplashSeenAt';
+  const seenAt = Number(localStorage.getItem(KEY) || 0);
+  const DAY = 24*60*60*1000;
+  const now = Date.now();
+  const shouldShow = !seenAt || (now - seenAt) > DAY;
+
+  function scBeacon(label){
+    try{
+      const i = new Image();
+      i.src = "https://c.statcounter.com/13176686/0/1c58bc44/1/"
+            + "?title=" + encodeURIComponent(label)
+            + "&u=" + encodeURIComponent(location.href)
+            + "&cb=" + Math.random();
+    }catch(e){}
+  }
+
+  function hideSplash(){
+    localStorage.setItem(KEY, String(Date.now()));
+    splash.classList.add('hidden');
+    setTimeout(()=> splash.remove(), 400);
+    scBeacon("Splash Dismissed");
+  }
+
+  if(shouldShow){
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    scBeacon("Splash Shown");
+
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const delay = prefersReduced ? 800 : 2200;
+    const timer = setTimeout(()=>{ hideSplash(); document.body.style.overflow = prevOverflow; }, delay);
+
+    skip.addEventListener('click', (e)=>{
+      e.preventDefault();
+      clearTimeout(timer);
+      hideSplash();
+      document.body.style.overflow = prevOverflow;
+      const main = document.getElementById('main');
+      if(main){ main.setAttribute('tabindex','-1'); main.focus(); }
+    }, { once:true });
+
+    window.addEventListener('keydown', ()=>{
+      clearTimeout(timer);
+      hideSplash();
+      document.body.style.overflow = prevOverflow;
+    }, { once:true });
+  } else {
+    splash.remove();
+  }
+})();
+</script>
+
 <!-- Statcounter -->
 <script type="text/javascript">
-  var sc_project = 13176686;      // QRI analytics project
-  var sc_invisible = 1;           // 1 = invisible counter
-  var sc_security = "1c58bc44";   // security code
+  var sc_project = 13176686;
+  var sc_invisible = 1;
+  var sc_security = "1c58bc44";
   var scJsHost = "https://";
   document.write("<sc"+"ript type='text/javascript' src='" + scJsHost + "statcounter.com/counter/counter.js'></" + "script>");
 </script>
