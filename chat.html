@@ -191,8 +191,6 @@ const exportBtn = document.getElementById('exportBtn');
 const escalateBox = document.getElementById('escalateBox');
 
 let history = loadHistory();
-renderHistory();
-scrollToBottom(true); // ensure bottom on initial load
 
 /* ---------- helpers ---------- */
 function loadHistory(){
@@ -212,11 +210,16 @@ function sanitize(str){
     .replace(/```([\s\S]*?)```/g, (_,code)=>`<div class="code">${code.replace(/</g,"&lt;")}</div>`);
 }
 
-function scrollToBottom(immediate=false){
-  const behavior = immediate ? 'auto' : 'smooth';
-  // schedule a couple of frames to beat layout timing
-  requestAnimationFrame(()=> chatEl.scrollTo({ top: chatEl.scrollHeight, behavior }));
-  setTimeout(()=> chatEl.scrollTo({ top: chatEl.scrollHeight, behavior }), 60);
+/* smart auto-scroll */
+function isNearBottom(px = 120) {
+  return chatEl.scrollTop + chatEl.clientHeight >= chatEl.scrollHeight - px;
+}
+function scrollToBottom(force = false) {
+  if (!force && !isNearBottom()) return;
+  const doScroll = () => chatEl.scrollTo({ top: chatEl.scrollHeight, behavior: 'smooth' });
+  requestAnimationFrame(doScroll);
+  setTimeout(doScroll, 60);
+  setTimeout(doScroll, 180);
 }
 
 function addMessage(role, content){
@@ -239,6 +242,14 @@ function renderHistory(){
   saveHistory();
 }
 
+/* ---------- initialize ---------- */
+renderHistory();
+window.addEventListener('load', () => scrollToBottom(true));
+setTimeout(() => scrollToBottom(true), 150);
+/* keep pinned to bottom on new messages and streaming updates */
+const mo = new MutationObserver(() => scrollToBottom(false));
+mo.observe(chatEl, { childList: true, subtree: true, characterData: true });
+
 /* ---------- sending ---------- */
 async function sendCurrent(){
   const text = inputEl.value.trim();
@@ -255,7 +266,6 @@ async function sendCurrent(){
   chatEl.appendChild(row);
   scrollToBottom();
 
-  // faux "disable" for the arrow
   sendBtn.classList.add('is-disabled');
   sendBtn.setAttribute('aria-disabled','true');
 
@@ -296,6 +306,7 @@ async function sendCurrent(){
       }
       bubble.classList.remove('thinking');
       history.push({role:"assistant", content:acc});
+      scrollToBottom();
     }else{
       const data = await res.json();
       bubble.classList.remove('thinking');
@@ -308,6 +319,7 @@ async function sendCurrent(){
     bubble.classList.remove('thinking');
     bubble.innerHTML = sanitize("Sorry, I could not reach the QRI server. Please try again in a moment.");
     console.error(err);
+    scrollToBottom();
   }finally{
     sendBtn.classList.remove('is-disabled');
     sendBtn.removeAttribute('aria-disabled');
@@ -332,11 +344,11 @@ inputEl.addEventListener('keydown', (e)=>{
   });
 })();
 
-document.getElementById('newBtn').addEventListener('click', ()=>{
+newBtn.addEventListener('click', ()=>{
   history = [{role:"system", content:SYSTEM_PROMPT}];
   saveHistory(); renderHistory(); scrollToBottom(true);
 });
-document.getElementById('exportBtn').addEventListener('click', ()=>{
+exportBtn.addEventListener('click', ()=>{
   const transcript = history.filter(m=>m.role!=="system")
     .map(m=>`${m.role.toUpperCase()}:\n${m.content}\n`).join("\n");
   const blob = new Blob([transcript], {type:"text/plain"});
