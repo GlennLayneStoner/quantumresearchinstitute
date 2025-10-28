@@ -7,19 +7,11 @@
 <meta name="color-scheme" content="dark light" />
 
 <style>
-
   :root{
-    --bg:#0b0e12;
-    --panel:#11151b;
-    --panel-2:#151a22;
-    --text:#e8eaed;
-    --muted:#a9b3c1;
-    --border:rgba(255,255,255,.08);
-    --accent:#00e1ff;
-    --accent-2:#29f0ff;
-    --radius:14px;
-    --radius-lg:20px;
-    --radius-xl:24px;
+    --bg:#0b0e12; --panel:#11151b; --panel-2:#151a22;
+    --text:#e8eaed; --muted:#a9b3c1; --border:rgba(255,255,255,.08);
+    --accent:#00e1ff; --accent-2:#29f0ff;
+    --radius:14px; --radius-lg:20px; --radius-xl:24px;
     --shadow:0 12px 36px rgba(0,0,0,.45);
   }
 
@@ -43,9 +35,7 @@
   }
   .bar{padding:10px 12px}
   .bar--stack{display:flex;flex-direction:column;gap:8px}
-  .title{
-    font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  }
+  .title{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .title .sep{opacity:.7;margin:0 .25ch}
   .title .sub{font-weight:600;opacity:.9}
   .actions--row{display:flex;gap:8px;flex-wrap:wrap}
@@ -59,12 +49,6 @@
   }
   .btn.secondary{background:rgba(255,255,255,.03)}
   .btn:disabled{opacity:.6;cursor:not-allowed}
-  .btn.send{
-    background:linear-gradient(180deg, var(--accent-2), var(--accent));
-    color:#001a1d;font-weight:700;border:none;
-    box-shadow:0 6px 18px rgba(0,225,255,.25)
-  }
-  .btn.send:hover{filter:brightness(1.05)}
 
   /* Chat area */
   .chat{
@@ -98,7 +82,7 @@
     box-shadow:0 6px 18px rgba(0,225,255,.25)
   }
 
-  /* Make assistant replies pop more */
+  /* Assistant contrast boost */
   .msg.assistant .bubble{
     background: rgba(255,255,255,0.10) !important;
     color:#e8eaed !important;
@@ -129,13 +113,20 @@
     border:1px solid rgba(255,255,255,.12);
     border-radius:16px;padding:12px 14px;outline:none
   }
-  .send{min-width:84px;height:44px}
-  .tools{
-    display:flex;gap:12px;align-items:center;justify-content:space-between;
-    margin-top:8px;color:var(--muted);font-size:.9rem
+
+  /* Minimal send arrow (no button) */
+  .send-arrow{
+    font-size:20px; line-height:1;
+    color:var(--accent);
+    cursor:pointer !important;
+    user-select:none;
+    margin-left:6px; padding:0 6px;
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .15s ease, color .15s ease, opacity .15s ease;
   }
-  label.inline{display:inline-flex;align-items:center;gap:8px;cursor:pointer}
-  .safe-bottom{padding-bottom:env(safe-area-inset-bottom)}
+  .send-arrow:hover{ transform:scale(1.25); color:#5ffff0; }
+  .send-arrow:active{ transform:scale(1.15); opacity:.85; }
+  .send-arrow.is-disabled{ opacity:.45; pointer-events:none; }
 
   /* Hide session count to save space */
   #usage{display:none !important;}
@@ -157,26 +148,25 @@
 
   <main class="chat" id="chat" aria-live="polite" aria-label="Chat messages"></main>
 
-<footer class="composer safe-bottom">
-  <div class="row">
-    <textarea id="input" placeholder="Describe your idea or paste a section of your draft... Ctrl+Enter to send"></textarea>
-    <div id="sendBtn" class="send-arrow" title="Send">➤</div>
-  </div>
-  <div class="tools">
-    <label class="inline">
-      <input type="checkbox" id="escalateBox">
-      Escalate 1 turn
-    </label>
-  </div>
-</footer>
-
-
+  <footer class="composer safe-bottom">
+    <div class="row">
+      <textarea id="input" placeholder="Describe your idea or paste a section of your draft... Ctrl+Enter to send"></textarea>
+      <div id="sendBtn" class="send-arrow" role="button" tabindex="0" aria-label="Send">➤</div>
+    </div>
+    <div class="tools">
+      <label class="inline">
+        <input type="checkbox" id="escalateBox">
+        Escalate 1 turn
+      </label>
+      <div id="usage" class="badge">0</div>
+    </div>
+  </footer>
 </div>
 
 <script>
 /* ---------- config ---------- */
 const API_URL = "https://quantumresearchinstitute.vercel.app/api/qri-chat";
-const SYSTEM_PROMPT = `You are Quari,the QRI Theory Guide for the **Quantum Research Institute** (QRI).
+const SYSTEM_PROMPT = `You are Quari, the QRI Theory Guide for the **Quantum Research Institute** (QRI).
 In this chat, “QRI” ALWAYS means **Quantum Research Institute** (the website you’re on), not any other organization.
 If a user mentions or implies “Qualia Research Institute”, briefly note it is a different group and ask if they want to continue with the **Quantum Research Institute** workflow.
 
@@ -199,10 +189,10 @@ const sendBtn = document.getElementById('sendBtn');
 const newBtn = document.getElementById('newBtn');
 const exportBtn = document.getElementById('exportBtn');
 const escalateBox = document.getElementById('escalateBox');
-const usageEl = document.getElementById('usage');
 
 let history = loadHistory();
 renderHistory();
+scrollToBottom(true); // ensure bottom on initial load
 
 /* ---------- helpers ---------- */
 function loadHistory(){
@@ -217,6 +207,18 @@ function saveHistory(){
 }
 function el(tag, cls, html){ const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; }
 
+function sanitize(str){
+  return String(str).replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/```([\s\S]*?)```/g, (_,code)=>`<div class="code">${code.replace(/</g,"&lt;")}</div>`);
+}
+
+function scrollToBottom(immediate=false){
+  const behavior = immediate ? 'auto' : 'smooth';
+  // schedule a couple of frames to beat layout timing
+  requestAnimationFrame(()=> chatEl.scrollTo({ top: chatEl.scrollHeight, behavior }));
+  setTimeout(()=> chatEl.scrollTo({ top: chatEl.scrollHeight, behavior }), 60);
+}
+
 function addMessage(role, content){
   const row = el('div', `msg ${role}`);
   const avatar = el('div','avatar');
@@ -225,16 +227,9 @@ function addMessage(role, content){
   if(role==='assistant'){ row.appendChild(avatar); }
   row.appendChild(bubble);
   chatEl.appendChild(row);
- setTimeout(() => chatEl.scrollTo({ top: chatEl.scrollHeight, behavior: 'smooth' }), 50);
-
+  scrollToBottom();
 }
 
-function sanitize(str){
-  return String(str).replace(/</g,"&lt;").replace(/>/g,"&gt;")
-    .replace(/```([\s\S]*?)```/g, (_,code)=>`<div class="code">${code.replace(/</g,"&lt;")}</div>`);
-}
-
-/* ---------- initial render ---------- */
 function renderHistory(){
   chatEl.innerHTML = "";
   for(const m of history){
@@ -257,9 +252,12 @@ async function sendCurrent(){
   const avatar = el('div','avatar');
   const bubble = el('div','bubble thinking'); bubble.textContent = "Thinking...";
   row.appendChild(avatar); row.appendChild(bubble);
-  chatEl.appendChild(row); chatEl.scrollTop = chatEl.scrollHeight;
+  chatEl.appendChild(row);
+  scrollToBottom();
 
-  sendBtn.disabled = true;
+  // faux "disable" for the arrow
+  sendBtn.classList.add('is-disabled');
+  sendBtn.setAttribute('aria-disabled','true');
 
   try{
     const body = { messages: history, meta: { escalate: !!escalateBox.checked } };
@@ -288,10 +286,11 @@ async function sendCurrent(){
             const delta = obj.delta ?? obj.content ?? "";
             acc += delta;
             bubble.innerHTML = sanitize(acc);
-            chatEl.scrollTop = chatEl.scrollHeight;
+            scrollToBottom();
           }catch{
             acc += m;
             bubble.innerHTML = sanitize(acc);
+            scrollToBottom();
           }
         }
       }
@@ -302,6 +301,7 @@ async function sendCurrent(){
       bubble.classList.remove('thinking');
       bubble.innerHTML = sanitize(data.content || "");
       history.push({role:"assistant", content:data.content || ""});
+      scrollToBottom();
     }
     saveHistory();
   }catch(err){
@@ -309,28 +309,32 @@ async function sendCurrent(){
     bubble.innerHTML = sanitize("Sorry, I could not reach the QRI server. Please try again in a moment.");
     console.error(err);
   }finally{
-    sendBtn.disabled = false;
+    sendBtn.classList.remove('is-disabled');
+    sendBtn.removeAttribute('aria-disabled');
   }
 }
 
+/* Controls */
 sendBtn.addEventListener('click', sendCurrent);
+sendBtn.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); sendCurrent(); }
+});
 inputEl.addEventListener('keydown', (e)=>{
   if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){ sendCurrent(); }
 });
-/* Enter sends unless Shift is held */
 (function(){
   const ta = document.getElementById('input');
   ta.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
       e.preventDefault();
-      document.getElementById('sendBtn').click();
+      sendBtn.click();
     }
   });
 })();
 
 document.getElementById('newBtn').addEventListener('click', ()=>{
   history = [{role:"system", content:SYSTEM_PROMPT}];
-  saveHistory(); renderHistory();
+  saveHistory(); renderHistory(); scrollToBottom(true);
 });
 document.getElementById('exportBtn').addEventListener('click', ()=>{
   const transcript = history.filter(m=>m.role!=="system")
