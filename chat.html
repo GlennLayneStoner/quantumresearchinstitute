@@ -59,8 +59,7 @@
     scroll-behavior:auto;           /* JS will smooth when needed */
     margin-top:12px;
     padding:16px;
-    /* key: give real bottom padding so last line never sits under composer */
-    padding-bottom: calc(16px + var(--composerH) + env(safe-area-inset-bottom, 0px));
+    /* removed gap padding-bottom; anchor now provides spacer */
     background:var(--panel);
     border:1px solid rgba(255,255,255,.06);
     border-radius:var(--radius-xl);
@@ -69,6 +68,7 @@
     scroll-padding-bottom: calc(var(--composerH) + env(safe-area-inset-bottom, 0px));
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain; /* avoid browser bounce fighting us */
+    min-height:0; /* critical so flex child can actually scroll */
   }
 
   .msg{display:flex;gap:10px;margin:10px 0}
@@ -141,9 +141,14 @@
   /* Hide session count to save space */
   #usage{display:none !important;}
 
-  /* Prevent browser scroll anchoring from fighting us */
+  /* Scroll anchoring + spacer handled by the anchor */
   .chat { overflow-anchor: none; }
-  #bottomAnchor { overflow-anchor: auto; height: 1px; }
+  #bottomAnchor{
+    overflow-anchor: auto;
+    height: 1px;
+    /* spacer equal to composer height + safe-area, prevents clipping without gaps */
+    margin-bottom: calc(16px + var(--composerH) + env(safe-area-inset-bottom, 0px));
+  }
 </style>
 </head>
 
