@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>QRI Guide</title>
 <meta name="color-scheme" content="dark light" />
+
+<!-- Modernized UI styles -->
 <style>
   :root{
     --bg:#0b0e12;
@@ -13,7 +15,7 @@
     --text:#e8eaed;
     --muted:#a9b3c1;
     --border:rgba(255,255,255,.08);
-    --accent:#00e1ff;      /* match your glowing Q */
+    --accent:#00e1ff;      /* match the glowing Q */
     --accent-2:#29f0ff;
     --radius:14px;
     --radius-lg:20px;
@@ -22,14 +24,16 @@
   }
 
   html,body{
-    margin:0;padding:0;background:
-      radial-gradient(1200px 1200px at 20% -10%, #0f1730 0%, var(--bg) 55%);
+    margin:0;padding:0;
+    background: radial-gradient(1200px 1200px at 20% -10%, #0f1730 0%, var(--bg) 55%);
     color:var(--text);
     font:16px/1.6 Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
   }
   a{color:var(--accent)}
 
   .wrap{display:flex;flex-direction:column;min-height:100dvh;padding:8px}
+
+  /* Header */
   header{
     position:sticky;top:0;z-index:10;
     background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
@@ -61,7 +65,7 @@
   }
   .btn.send:hover{filter:brightness(1.05)}
 
-  /* chat area */
+  /* Chat area */
   .chat{
     flex:1;overflow:auto;scroll-behavior:smooth;
     margin-top:12px;padding:16px;
@@ -93,10 +97,10 @@
     box-shadow:0 6px 18px rgba(0,225,255,.25)
   }
 
-  /* “Thinking…” style (already used in your JS) */
+  /* “Thinking…” placeholder */
   .thinking{opacity:.75}
 
-  /* code blocks inside messages */
+  /* Inline code blocks */
   .code{
     font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
     font-size:.95rem;line-height:1.5;
@@ -104,7 +108,7 @@
     border:1px solid rgba(255,255,255,.12);overflow:auto
   }
 
-  /* composer */
+  /* Composer */
   .composer{
     position:sticky;bottom:0;margin-top:12px;
     background:linear-gradient(180deg, rgba(17,21,27,.92), rgba(17,21,27,.98));
@@ -127,8 +131,8 @@
   label.inline{display:inline-flex;align-items:center;gap:8px;cursor:pointer}
   .safe-bottom{padding-bottom:env(safe-area-inset-bottom)}
 </style>
-
 </head>
+
 <body>
 <div class="wrap">
   <header>
@@ -140,7 +144,9 @@
           <span class="badge">Gate 1 to 4 workflow assistant</span>
         </div>
       </div>
-      <div class="actions" style="display:flex;gap:8px">
+      <div class="actions">
+        <!-- New Home button -->
+        <button class="btn" onclick="location.href='/'" title="Home">Home</button>
         <button id="newBtn" class="btn secondary" title="New session">New</button>
         <button id="exportBtn" class="btn secondary" title="Download as .txt">Export</button>
       </div>
@@ -166,8 +172,7 @@
 
 <script>
 /* ---------- config ---------- */
-const API_URL = "https://quantumresearchinstitute.vercel.app/api/qri-chat";
- // your server endpoint
+const API_URL = "https://quantumresearchinstitute.vercel.app/api/qri-chat"; // your server endpoint
 const SYSTEM_PROMPT = `You are the QRI Theory Guide for the **Quantum Research Institute** (QRI).
 In this chat, “QRI” ALWAYS means **Quantum Research Institute** (the website you’re on), not any other organization.
 If a user mentions or implies “Qualia Research Institute”, briefly note it is a different group and ask if they want to continue with the **Quantum Research Institute** workflow.
@@ -180,11 +185,11 @@ Your job: turn an idea into a rigorous plan through four gates:
 
 Keep answers short, numbered, and end with one actionable next step. Avoid jargon unless asked.`;
 
+/* ---------- state ---------- */
 const HISTORY_KEY = "qriHistoryV1";       // localStorage key
 const MAX_TURNS  = 30;                     // keep history light
 const STREAMING  = true;                   // try to stream if server supports it
 
-/* ---------- state ---------- */
 const chatEl = document.getElementById('chat');
 const inputEl = document.getElementById('input');
 const sendBtn = document.getElementById('sendBtn');
@@ -223,9 +228,8 @@ function addMessage(role, content){
 }
 
 function sanitize(str){
-  // very light sanitizer: escape angle brackets
+  // very light sanitizer: escape angle brackets and render ``` blocks
   return String(str).replace(/</g,"&lt;").replace(/>/g,"&gt;")
-    // simple markdown-ish code blocks
     .replace(/```([\s\S]*?)```/g, (_,code)=>`<div class="code">${code.replace(/</g,"&lt;")}</div>`);
 }
 
@@ -269,7 +273,6 @@ async function sendCurrent(){
       body: JSON.stringify(body)
     });
 
-    // Try streaming if response is not application/json
     const ctype = res.headers.get("Content-Type") || "";
     if(STREAMING && !ctype.includes("application/json") && res.body && "getReader" in res.body){
       bubble.textContent = "";
@@ -280,7 +283,6 @@ async function sendCurrent(){
         const {done, value} = await reader.read();
         if(done) break;
         const chunk = decoder.decode(value, {stream:true});
-        // If server sends SSE lines like: "data: { delta: 'text' }"
         const lines = chunk.split(/\r?\n/).filter(Boolean);
         for(const line of lines){
           const m = line.startsWith("data:") ? line.slice(5).trim() : line;
@@ -291,7 +293,6 @@ async function sendCurrent(){
             bubble.innerHTML = sanitize(acc);
             chatEl.scrollTop = chatEl.scrollHeight;
           }catch{
-            // plain text stream fallback
             acc += m;
             bubble.innerHTML = sanitize(acc);
           }
@@ -300,7 +301,6 @@ async function sendCurrent(){
       bubble.classList.remove('thinking');
       history.push({role:"assistant", content:acc});
     }else{
-      // non streaming JSON: { role:"assistant", content:"..." }
       const data = await res.json();
       bubble.classList.remove('thinking');
       bubble.innerHTML = sanitize(data.content || "");
@@ -310,6 +310,7 @@ async function sendCurrent(){
   }catch(err){
     bubble.classList.remove('thinking');
     bubble.innerHTML = sanitize("Sorry, I could not reach the QRI server. Please try again in a moment.");
+    console.error(err);
   }finally{
     sendBtn.disabled = false;
   }
@@ -317,8 +318,20 @@ async function sendCurrent(){
 
 sendBtn.addEventListener('click', sendCurrent);
 inputEl.addEventListener('keydown', (e)=>{
+  // Ctrl/Cmd+Enter stays; Enter (without Shift) sends too
   if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){ sendCurrent(); }
 });
+/* Optional helper: Enter sends unless Shift is held */
+(function(){
+  const ta = document.getElementById('input');
+  ta.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+      e.preventDefault();
+      document.getElementById('sendBtn').click();
+    }
+  });
+})();
+
 document.getElementById('newBtn').addEventListener('click', ()=>{
   history = [{role:"system", content:SYSTEM_PROMPT}];
   saveHistory(); renderHistory();
@@ -332,27 +345,22 @@ document.getElementById('exportBtn').addEventListener('click', ()=>{
   URL.revokeObjectURL(url);
 });
 </script>
+
+<!-- Optional: Statcounter helper beacon (kept from your file) -->
 <script>
-  // after your send button handler resolves, ping a lightweight beacon
   function trackSend(){
-    // creates a throwaway image request so it logs as an additional pageview labeled "QRI Chat Send"
     const i = new Image();
     i.src = "https://c.statcounter.com/13176686/0/1c58bc44/1/?title=" + encodeURIComponent("QRI Chat Send");
   }
-  // call trackSend() at the end of your send handler (only on successful submit)
-</script>
-
-  <script>
-  // Make the page title clear in Statcounter logs
   document.title = "QRI Chat Drawer";
 </script>
 
-<!-- Statcounter for the chat iframe -->
+<!-- Statcounter for the chat iframe (unchanged) -->
 <script type="text/javascript">
   var sc_project=13176686;
   var sc_invisible=1;
   var sc_security="1c58bc44";
-  var sc_remove_link=1; // keeps the badge/link hidden
+  var sc_remove_link=1;
 </script>
 <script async type="text/javascript" src="https://www.statcounter.com/counter/counter.js"></script>
 <noscript>
