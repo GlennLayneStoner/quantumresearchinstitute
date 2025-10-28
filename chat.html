@@ -13,8 +13,7 @@
     --accent:#00e1ff; --accent-2:#29f0ff;
     --radius:14px; --radius-lg:20px; --radius-xl:24px;
     --shadow:0 12px 36px rgba(0,0,0,.45);
-    /* new: dynamic composer height fallback */
-    --composerH: 88px;
+    --composerH: 88px; /* fallback; JS keeps this accurate */
   }
 
   html,body{
@@ -22,6 +21,7 @@
     background: radial-gradient(1200px 1200px at 20% -10%, #0f1730 0%, var(--bg) 55%);
     color:var(--text);
     font:16px/1.6 Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    height:100%;
   }
   a{color:var(--accent)}
   .wrap{display:flex;flex-direction:column;min-height:100dvh;padding:8px}
@@ -54,18 +54,21 @@
 
   /* Chat area */
   .chat{
-    flex:1;overflow:auto;
-    /* important: let JS control smoothness at specific moments */
-    scroll-behavior:auto;
-    margin-top:12px;padding:16px;
+    flex:1;
+    overflow:auto;
+    scroll-behavior:auto;           /* JS will smooth when needed */
+    margin-top:12px;
+    padding:16px;
+    /* key: give real bottom padding so last line never sits under composer */
+    padding-bottom: calc(16px + var(--composerH) + env(safe-area-inset-bottom, 0px));
     background:var(--panel);
     border:1px solid rgba(255,255,255,.06);
     border-radius:var(--radius-xl);
     box-shadow: 0 10px 40px rgba(0,0,0,.35);
     display:flex;flex-direction:column;
-    /* new: ensures the last lines are never under the composer */
-    scroll-padding-bottom: var(--composerH);
+    scroll-padding-bottom: calc(var(--composerH) + env(safe-area-inset-bottom, 0px));
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain; /* avoid browser bounce fighting us */
   }
 
   .msg{display:flex;gap:10px;margin:10px 0}
@@ -111,7 +114,7 @@
     background:linear-gradient(180deg, rgba(17,21,27,.92), rgba(17,21,27,.98));
     border:1px solid rgba(255,255,255,.06);
     border-radius:var(--radius-xl);
-    padding:10px 10px 8px;
+    padding:10px 10px calc(8px + env(safe-area-inset-bottom, 0px));
   }
   .row{display:flex;gap:10px;align-items:center}
   textarea{
@@ -121,7 +124,7 @@
     border-radius:16px;padding:12px 14px;outline:none
   }
 
-  /* Minimal send arrow (no button) */
+  /* Minimal send arrow */
   .send-arrow{
     font-size:20px; line-height:1;
     color:var(--accent);
@@ -162,7 +165,6 @@
     <div id="bottomAnchor" aria-hidden="true"></div>
   </main>
 
-  <!-- added id="composer" so we can measure height -->
   <footer id="composer" class="composer safe-bottom">
     <div class="row">
       <textarea id="input" placeholder="Describe your idea or paste a section of your draft... Ctrl+Enter to send"></textarea>
@@ -226,7 +228,7 @@ function sanitize(str){
     .replace(/```([\s\S]*?)```/g, (_,code)=>`<div class="code">${code.replace(/</g,"&lt;")}</div>`);
 }
 
-/* ---------- new: dynamic padding equal to composer height ---------- */
+/* ---------- dynamic padding equal to composer height ---------- */
 function setComposerPadding(){
   if(!composer) return;
   const h = composer.getBoundingClientRect().height || 0;
@@ -235,27 +237,25 @@ function setComposerPadding(){
 new ResizeObserver(setComposerPadding).observe(composer);
 setComposerPadding();
 
-/* ---------- scrolling ---------- */
-function isNearBottom(px = 24){
+/* ---------- scrolling utils ---------- */
+function isNearBottom(px = 64){
   return (chatEl.scrollHeight - chatEl.clientHeight - chatEl.scrollTop) <= px;
 }
-
+function isAnchorVisible(){
+  const cr = chatEl.getBoundingClientRect();
+  const ar = bottomAnchor.getBoundingClientRect();
+  return ar.bottom <= cr.bottom + 0.5; // anchor fully in view
+}
 function hardJumpToBottom(){
-  // use both methods for belt and suspenders
   chatEl.scrollTop = chatEl.scrollHeight;
   bottomAnchor.scrollIntoView({block:'end', inline:'nearest', behavior:'auto'});
 }
-
-function smoothJumpToBottom(){
-  chatEl.style.scrollBehavior = 'smooth';
-  bottomAnchor.scrollIntoView({block:'end', inline:'nearest', behavior:'smooth'});
-  setTimeout(()=>{ chatEl.style.scrollBehavior = 'auto'; }, 300);
-}
-
-async function settleThenBottom(forceSmooth=false){
-  try{ await (document.fonts ? document.fonts.ready : Promise.resolve()); }catch{}
-  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-  if(forceSmooth) smoothJumpToBottom(); else hardJumpToBottom();
+async function ensureBottom(attempts = 8){
+  for(let i=0;i<attempts;i++){
+    hardJumpToBottom();
+    if (isAnchorVisible()) return;
+    await new Promise(r => requestAnimationFrame(r));
+  }
 }
 
 /* Render */
@@ -267,11 +267,10 @@ function addMessage(role, content){
   if(role==='assistant'){ row.appendChild(avatar); }
   row.appendChild(bubble);
   chatEl.insertBefore(row, bottomAnchor);
-  if(isNearBottom()) hardJumpToBottom();
+  if(isNearBottom()) ensureBottom();
 }
 
 function renderHistory(){
-  // preserve the same bottomAnchor node
   chatEl.innerHTML = '';
   chatEl.appendChild(bottomAnchor);
   for(const m of history){
@@ -283,24 +282,32 @@ function renderHistory(){
 
 /* ---------- initialize ---------- */
 renderHistory();
-// settle after full layout so we truly land at the last line
-if (document.readyState === 'loading'){
-  document.addEventListener('DOMContentLoaded', () => settleThenBottom(false), {once:true});
-} else {
-  settleThenBottom(false);
-}
-// a couple of safety kicks for slow assets
-setTimeout(() => settleThenBottom(false), 150);
-setTimeout(() => settleThenBottom(false), 400);
 
-/* ---------- keep pinned only when near bottom ---------- */
+function settleThenBottom(){
+  Promise.resolve(document.fonts ? document.fonts.ready : null)
+    .then(()=> new Promise(r => requestAnimationFrame(()=>requestAnimationFrame(r))))
+    .then(()=> ensureBottom());
+}
+
+if (document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', settleThenBottom, {once:true});
+} else {
+  settleThenBottom();
+}
+setTimeout(settleThenBottom, 150);
+setTimeout(settleThenBottom, 400);
+
+/* keep pinned only when already near bottom */
 const mo = new MutationObserver(() => {
-  if (isNearBottom()) hardJumpToBottom();
+  if (isNearBottom()) ensureBottom();
 });
 mo.observe(chatEl, { childList: true, subtree: true, characterData: true });
 
-/* re-pin on resize/keyboard open */
-window.addEventListener('resize', () => { if(isNearBottom()) hardJumpToBottom(); });
+/* re-pin on resize or virtual keyboard changes */
+window.addEventListener('resize', () => { if(isNearBottom()) ensureBottom(); });
+if (window.visualViewport){
+  visualViewport.addEventListener('resize', () => { if(isNearBottom()) ensureBottom(); });
+}
 
 /* ---------- sending ---------- */
 async function sendCurrent(){
@@ -316,7 +323,7 @@ async function sendCurrent(){
   const bubble = el('div','bubble thinking'); bubble.textContent = "Thinking...";
   row.appendChild(avatar); row.appendChild(bubble);
   chatEl.insertBefore(row, bottomAnchor);
-  if(isNearBottom()) hardJumpToBottom();
+  if(isNearBottom()) ensureBottom();
 
   sendBtn.classList.add('is-disabled');
   sendBtn.setAttribute('aria-disabled','true');
@@ -347,30 +354,30 @@ async function sendCurrent(){
             const delta = obj.delta ?? obj.content ?? "";
             acc += delta;
             bubble.innerHTML = sanitize(acc);
-            if(isNearBottom()) hardJumpToBottom();
+            if(isNearBottom()) ensureBottom();
           }catch{
             acc += m;
             bubble.innerHTML = sanitize(acc);
-            if(isNearBottom()) hardJumpToBottom();
+            if(isNearBottom()) ensureBottom();
           }
         }
       }
       bubble.classList.remove('thinking');
       history.push({role:"assistant", content:acc});
-      if(isNearBottom()) hardJumpToBottom();
+      if(isNearBottom()) ensureBottom();
     }else{
       const data = await res.json();
       bubble.classList.remove('thinking');
       bubble.innerHTML = sanitize(data.content || "");
       history.push({role:"assistant", content:data.content || ""});
-      if(isNearBottom()) hardJumpToBottom();
+      if(isNearBottom()) ensureBottom();
     }
     saveHistory();
   }catch(err){
     bubble.classList.remove('thinking');
     bubble.innerHTML = sanitize("Sorry, I could not reach the QRI server. Please try again in a moment.");
     console.error(err);
-    if(isNearBottom()) hardJumpToBottom();
+    if(isNearBottom()) ensureBottom();
   }finally{
     sendBtn.classList.remove('is-disabled');
     sendBtn.removeAttribute('aria-disabled');
@@ -397,7 +404,7 @@ inputEl.addEventListener('keydown', (e)=>{
 
 newBtn.addEventListener('click', ()=>{
   history = [{role:"system", content:SYSTEM_PROMPT}];
-  saveHistory(); renderHistory(); settleThenBottom(false);
+  saveHistory(); renderHistory(); settleThenBottom();
 });
 exportBtn.addEventListener('click', ()=>{
   const transcript = history.filter(m=>m.role!=="system")
