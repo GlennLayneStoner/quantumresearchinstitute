@@ -6,13 +6,7 @@
 <title>QRI Guide</title>
 <meta name="color-scheme" content="dark light" />
 
-<!-- Modernized UI styles -->
 <style>
-
-.msg.assistant .bubble { background: rgba(255,255,255,0.08); color: #e8eaed; }
-
-
-  
   :root{
     --bg:#0b0e12;
     --panel:#11151b;
@@ -20,7 +14,7 @@
     --text:#e8eaed;
     --muted:#a9b3c1;
     --border:rgba(255,255,255,.08);
-    --accent:#00e1ff;      /* match the glowing Q */
+    --accent:#00e1ff;
     --accent-2:#29f0ff;
     --radius:14px;
     --radius-lg:20px;
@@ -35,7 +29,6 @@
     font:16px/1.6 Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
   }
   a{color:var(--accent)}
-
   .wrap{display:flex;flex-direction:column;min-height:100dvh;padding:8px}
 
   /* Header */
@@ -47,15 +40,16 @@
     border-radius:var(--radius-xl);
     box-shadow: 0 10px 40px rgba(0,0,0,.28);
   }
-  .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px}
-  .brand{display:flex;align-items:center;gap:10px}
-  .dot{
-    width:10px;height:10px;border-radius:50%;
-    background: radial-gradient(circle at 30% 30%, var(--accent-2), var(--accent));
-    box-shadow:0 0 12px var(--accent);
+  .bar{padding:10px 12px}
+  .bar--stack{display:flex;flex-direction:column;gap:8px}
+  .title{
+    font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
-  .badge{font-size:.85rem;color:var(--muted)}
-  .actions{display:flex;gap:8px;align-items:center}
+  .title .sep{opacity:.7;margin:0 .25ch}
+  .title .sub{font-weight:600;opacity:.9}
+  .actions--row{display:flex;gap:8px;flex-wrap:wrap}
+  @media (min-width: 720px){ .actions--row{justify-content:flex-end} }
+
   .btn{
     display:inline-flex;align-items:center;gap:8px;
     background:rgba(255,255,255,.04);color:var(--text);
@@ -66,7 +60,8 @@
   .btn:disabled{opacity:.6;cursor:not-allowed}
   .btn.send{
     background:linear-gradient(180deg, var(--accent-2), var(--accent));
-    color:#001a1d;font-weight:700;border:none;box-shadow:0 6px 18px rgba(0,225,255,.25)
+    color:#001a1d;font-weight:700;border:none;
+    box-shadow:0 6px 18px rgba(0,225,255,.25)
   }
   .btn.send:hover{filter:brightness(1.05)}
 
@@ -102,10 +97,15 @@
     box-shadow:0 6px 18px rgba(0,225,255,.25)
   }
 
-  /* “Thinking…” placeholder */
+  /* Make assistant replies pop more */
+  .msg.assistant .bubble{
+    background: rgba(255,255,255,0.10) !important;
+    color:#e8eaed !important;
+    box-shadow: 0 10px 36px rgba(0,0,0,.35), inset 0 0 0 1px rgba(0,225,255,.14);
+  }
+
   .thinking{opacity:.75}
 
-  /* Inline code blocks */
   .code{
     font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
     font-size:.95rem;line-height:1.5;
@@ -119,11 +119,11 @@
     background:linear-gradient(180deg, rgba(17,21,27,.92), rgba(17,21,27,.98));
     border:1px solid rgba(255,255,255,.06);
     border-radius:var(--radius-xl);
-    padding:12px 12px 10px
+    padding:10px 10px 8px;
   }
   .row{display:flex;gap:10px;align-items:center}
   textarea{
-    flex:1;min-height:52px;max-height:38vh;resize:vertical;
+    flex:1;min-height:50px;max-height:38vh;resize:vertical;
     background:#0f141b;color:var(--text);
     border:1px solid rgba(255,255,255,.12);
     border-radius:16px;padding:12px 14px;outline:none
@@ -135,28 +135,24 @@
   }
   label.inline{display:inline-flex;align-items:center;gap:8px;cursor:pointer}
   .safe-bottom{padding-bottom:env(safe-area-inset-bottom)}
+
+  /* Hide session count to save space */
+  #usage{display:none !important;}
 </style>
 </head>
 
 <body>
 <div class="wrap">
   <header>
-  <div class="bar">
-    <div class="brand">
-      <div class="dot" aria-hidden="true"></div>
-      <div>
-        <strong>Quari</strong><br>
-        <span class="badge">the Quantum Research Institute</span>
+    <div class="bar bar--stack">
+      <div class="title">Quari <span class="sep">·</span> <span class="sub">the QRI research assistant</span></div>
+      <div class="actions actions--row">
+        <button class="btn" onclick="location.href='/'" title="Home">Home</button>
+        <button id="newBtn" class="btn secondary" title="New session">New</button>
+        <button id="exportBtn" class="btn secondary" title="Download as .txt">Export</button>
       </div>
     </div>
-    <div class="actions">
-      <button class="btn" onclick="location.href='/'" title="Home">Home</button>
-      <button id="newBtn" class="btn secondary" title="New session">New</button>
-      <button id="exportBtn" class="btn secondary" title="Download as .txt">Export</button>
-    </div>
-  </div>
-</header>
-
+  </header>
 
   <main class="chat" id="chat" aria-live="polite" aria-label="Chat messages"></main>
 
@@ -168,17 +164,17 @@
     <div class="tools">
       <label class="inline">
         <input type="checkbox" id="escalateBox">
-        Escalate for math or proofs (uses higher power model for this one turn)
+        Escalate 1 turn
       </label>
-      <div id="usage" class="badge">0 messages in this session</div>
+      <div id="usage" class="badge">0</div>
     </div>
   </footer>
 </div>
 
 <script>
 /* ---------- config ---------- */
-const API_URL = "https://quantumresearchinstitute.vercel.app/api/qri-chat"; // your server endpoint
-const SYSTEM_PROMPT = `You are the QRI Theory Guide for the **Quantum Research Institute** (QRI).
+const API_URL = "https://quantumresearchinstitute.vercel.app/api/qri-chat";
+const SYSTEM_PROMPT = `You are Quari,the QRI Theory Guide for the **Quantum Research Institute** (QRI).
 In this chat, “QRI” ALWAYS means **Quantum Research Institute** (the website you’re on), not any other organization.
 If a user mentions or implies “Qualia Research Institute”, briefly note it is a different group and ask if they want to continue with the **Quantum Research Institute** workflow.
 
@@ -191,9 +187,9 @@ Your job: turn an idea into a rigorous plan through four gates:
 Keep answers short, numbered, and end with one actionable next step. Avoid jargon unless asked.`;
 
 /* ---------- state ---------- */
-const HISTORY_KEY = "qriHistoryV1";       // localStorage key
-const MAX_TURNS  = 30;                     // keep history light
-const STREAMING  = true;                   // try to stream if server supports it
+const HISTORY_KEY = "qriHistoryV1";
+const MAX_TURNS  = 30;
+const STREAMING  = true;
 
 const chatEl = document.getElementById('chat');
 const inputEl = document.getElementById('input');
@@ -214,10 +210,8 @@ function loadHistory(){
   }catch{ return [{role:"system", content:SYSTEM_PROMPT}]; }
 }
 function saveHistory(){
-  const trimmed = history.slice(-1 - MAX_TURNS*2); // keep system + last N turns
+  const trimmed = history.slice(-1 - MAX_TURNS*2);
   localStorage.setItem(HISTORY_KEY, JSON.stringify(trimmed));
-  const turns = Math.max(0, Math.floor((trimmed.length-1)/2));
-  usageEl.textContent = `${turns} message${turns===1?"":"s"} in this session`;
 }
 function el(tag, cls, html){ const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; }
 
@@ -233,7 +227,6 @@ function addMessage(role, content){
 }
 
 function sanitize(str){
-  // very light sanitizer: escape angle brackets and render ``` blocks
   return String(str).replace(/</g,"&lt;").replace(/>/g,"&gt;")
     .replace(/```([\s\S]*?)```/g, (_,code)=>`<div class="code">${code.replace(/</g,"&lt;")}</div>`);
 }
@@ -257,7 +250,6 @@ async function sendCurrent(){
   history.push({role:"user", content:text});
   saveHistory();
 
-  // placeholder assistant bubble while we wait
   const row = el('div','msg assistant');
   const avatar = el('div','avatar');
   const bubble = el('div','bubble thinking'); bubble.textContent = "Thinking...";
@@ -267,10 +259,7 @@ async function sendCurrent(){
   sendBtn.disabled = true;
 
   try{
-    const body = {
-      messages: history,
-      meta: { escalate: !!escalateBox.checked }
-    };
+    const body = { messages: history, meta: { escalate: !!escalateBox.checked } };
 
     const res = await fetch(API_URL, {
       method:"POST",
@@ -323,10 +312,9 @@ async function sendCurrent(){
 
 sendBtn.addEventListener('click', sendCurrent);
 inputEl.addEventListener('keydown', (e)=>{
-  // Ctrl/Cmd+Enter stays; Enter (without Shift) sends too
   if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){ sendCurrent(); }
 });
-/* Optional helper: Enter sends unless Shift is held */
+/* Enter sends unless Shift is held */
 (function(){
   const ta = document.getElementById('input');
   ta.addEventListener('keydown', (e) => {
@@ -351,7 +339,6 @@ document.getElementById('exportBtn').addEventListener('click', ()=>{
 });
 </script>
 
-<!-- Optional: Statcounter helper beacon (kept from your file) -->
 <script>
   function trackSend(){
     const i = new Image();
@@ -360,7 +347,6 @@ document.getElementById('exportBtn').addEventListener('click', ()=>{
   document.title = "QRI Chat Drawer";
 </script>
 
-<!-- Statcounter for the chat iframe (unchanged) -->
 <script type="text/javascript">
   var sc_project=13176686;
   var sc_invisible=1;
