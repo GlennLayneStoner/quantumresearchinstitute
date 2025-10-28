@@ -130,6 +130,10 @@
 
   /* Hide session count to save space */
   #usage{display:none !important;}
+
+  /* Prevent browser scroll anchoring from fighting us */
+  .chat { overflow-anchor: none; }
+  #bottomAnchor { overflow-anchor: auto; height: 1px; }
 </style>
 </head>
 
@@ -146,7 +150,10 @@
     </div>
   </header>
 
-  <main class="chat" id="chat" aria-live="polite" aria-label="Chat messages"></main>
+  <main class="chat" id="chat" aria-live="polite" aria-label="Chat messages">
+    <!-- messages will be appended here -->
+    <div id="bottomAnchor" aria-hidden="true"></div>
+  </main>
 
   <footer class="composer safe-bottom">
     <div class="row">
@@ -184,6 +191,7 @@ const MAX_TURNS  = 30;
 const STREAMING  = true;
 
 const chatEl = document.getElementById('chat');
+const bottomAnchor = document.getElementById('bottomAnchor');
 const inputEl = document.getElementById('input');
 const sendBtn = document.getElementById('sendBtn');
 const newBtn = document.getElementById('newBtn');
@@ -204,24 +212,22 @@ function saveHistory(){
   localStorage.setItem(HISTORY_KEY, JSON.stringify(trimmed));
 }
 function el(tag, cls, html){ const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; }
-
 function sanitize(str){
   return String(str).replace(/</g,"&lt;").replace(/>/g,"&gt;")
     .replace(/```([\s\S]*?)```/g, (_,code)=>`<div class="code">${code.replace(/</g,"&lt;")}</div>`);
 }
 
-/* smart auto-scroll */
-function isNearBottom(px = 120) {
+/* Anchor-based scrolling (most reliable) */
+function isNearBottom(px = 140){
   return chatEl.scrollTop + chatEl.clientHeight >= chatEl.scrollHeight - px;
 }
-function scrollToBottom(force = false) {
-  if (!force && !isNearBottom()) return;
-  const doScroll = () => chatEl.scrollTo({ top: chatEl.scrollHeight, behavior: 'smooth' });
-  requestAnimationFrame(doScroll);
-  setTimeout(doScroll, 60);
-  setTimeout(doScroll, 180);
+function jumpToBottom(force=false){
+  if(!force && !isNearBottom()) return;
+  // scroll the invisible anchor into view
+  bottomAnchor.scrollIntoView({ behavior: force ? 'auto' : 'smooth', block: 'end' });
 }
 
+/* Render */
 function addMessage(role, content){
   const row = el('div', `msg ${role}`);
   const avatar = el('div','avatar');
@@ -229,12 +235,15 @@ function addMessage(role, content){
   bubble.innerHTML = sanitize(content);
   if(role==='assistant'){ row.appendChild(avatar); }
   row.appendChild(bubble);
-  chatEl.appendChild(row);
-  scrollToBottom();
+  // insert before the anchor so the anchor stays at the very bottom
+  chatEl.insertBefore(row, bottomAnchor);
+  jumpToBottom();
 }
 
 function renderHistory(){
-  chatEl.innerHTML = "";
+  chatEl.innerHTML = '';
+  // re-add anchor
+  chatEl.appendChild(bottomAnchor);
   for(const m of history){
     if(m.role==='system') continue;
     addMessage(m.role, m.content);
@@ -244,10 +253,13 @@ function renderHistory(){
 
 /* ---------- initialize ---------- */
 renderHistory();
-window.addEventListener('load', () => scrollToBottom(true));
-setTimeout(() => scrollToBottom(true), 150);
-/* keep pinned to bottom on new messages and streaming updates */
-const mo = new MutationObserver(() => scrollToBottom(false));
+// ensure we land at the bottom after fonts/layout/iframes settle
+window.addEventListener('load', () => jumpToBottom(true));
+setTimeout(() => jumpToBottom(true), 120);
+setTimeout(() => jumpToBottom(true), 350);
+
+// keep pinned to bottom on any DOM change (streaming, images, etc.)
+const mo = new MutationObserver(() => jumpToBottom(false));
 mo.observe(chatEl, { childList: true, subtree: true, characterData: true });
 
 /* ---------- sending ---------- */
@@ -263,15 +275,14 @@ async function sendCurrent(){
   const avatar = el('div','avatar');
   const bubble = el('div','bubble thinking'); bubble.textContent = "Thinking...";
   row.appendChild(avatar); row.appendChild(bubble);
-  chatEl.appendChild(row);
-  scrollToBottom();
+  chatEl.insertBefore(row, bottomAnchor);
+  jumpToBottom();
 
   sendBtn.classList.add('is-disabled');
   sendBtn.setAttribute('aria-disabled','true');
 
   try{
     const body = { messages: history, meta: { escalate: !!escalateBox.checked } };
-
     const res = await fetch(API_URL, {
       method:"POST",
       headers: { "Content-Type":"application/json" },
@@ -296,30 +307,30 @@ async function sendCurrent(){
             const delta = obj.delta ?? obj.content ?? "";
             acc += delta;
             bubble.innerHTML = sanitize(acc);
-            scrollToBottom();
+            jumpToBottom();
           }catch{
             acc += m;
             bubble.innerHTML = sanitize(acc);
-            scrollToBottom();
+            jumpToBottom();
           }
         }
       }
       bubble.classList.remove('thinking');
       history.push({role:"assistant", content:acc});
-      scrollToBottom();
+      jumpToBottom();
     }else{
       const data = await res.json();
       bubble.classList.remove('thinking');
       bubble.innerHTML = sanitize(data.content || "");
       history.push({role:"assistant", content:data.content || ""});
-      scrollToBottom();
+      jumpToBottom();
     }
     saveHistory();
   }catch(err){
     bubble.classList.remove('thinking');
     bubble.innerHTML = sanitize("Sorry, I could not reach the QRI server. Please try again in a moment.");
     console.error(err);
-    scrollToBottom();
+    jumpToBottom();
   }finally{
     sendBtn.classList.remove('is-disabled');
     sendBtn.removeAttribute('aria-disabled');
@@ -346,7 +357,7 @@ inputEl.addEventListener('keydown', (e)=>{
 
 newBtn.addEventListener('click', ()=>{
   history = [{role:"system", content:SYSTEM_PROMPT}];
-  saveHistory(); renderHistory(); scrollToBottom(true);
+  saveHistory(); renderHistory(); jumpToBottom(true);
 });
 exportBtn.addEventListener('click', ()=>{
   const transcript = history.filter(m=>m.role!=="system")
