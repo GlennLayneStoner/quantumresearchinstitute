@@ -225,7 +225,8 @@ function addMessage(role, content){
   if(role==='assistant'){ row.appendChild(avatar); }
   row.appendChild(bubble);
   chatEl.appendChild(row);
-  chatEl.scrollTop = chatEl.scrollHeight;
+ setTimeout(() => chatEl.scrollTo({ top: chatEl.scrollHeight, behavior: 'smooth' }), 50);
+
 }
 
 function sanitize(str){
