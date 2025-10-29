@@ -160,6 +160,36 @@
   max-height: 100%;
 }
 
+
+/* ---- EMBED MODE: size to the iframe, not the browser ---- */
+.is-embedded html,
+.is-embedded body,
+.is-embedded .wrap{ height:100%; }
+
+.is-embedded body{ overflow:hidden; }            /* outer page doesn't scroll */
+.is-embedded .chat{ min-height:0; max-height:100%; }
+
+/* we removed chat padding-bottom earlier; spacer lives on the anchor */
+.chat { overflow-anchor: none; }
+#bottomAnchor{
+  overflow-anchor:auto;
+  height:1px;
+  margin-bottom: calc(16px + var(--composerH) + env(safe-area-inset-bottom, 0px));
+}
+
+/* optional: keeps the inner scrollbar from popping layout */
+.chat{ scrollbar-gutter: stable both-edges; }
+
+/* TEMP DEBUG: show exactly where the browser thinks the bottom is */
+#bottomAnchor::after{
+  content:"";
+  display:block;
+  height:2px;
+  background:#ff2bd1;          /* hot pink debug line */
+  opacity:.8;
+}
+
+  
   
 </style>
 </head>
@@ -198,6 +228,12 @@
 </div>
 
 <script>
+
+  // If running inside a Framer <iframe>, switch to container-height layout
+if (window.self !== window.top) {
+  document.documentElement.classList.add('is-embedded');
+}
+
 
 // If running inside an <iframe> (Framer or any embed), fix height handling
 if (window.self !== window.top) {
