@@ -407,6 +407,11 @@ async function sendCurrent(){
         if(done) break;
         buf += decoder.decode(value, {stream:true});
 
+// ignore server keepalive pings
+if (event.startsWith("event: ping")) continue;
+
+
+        
         // process complete SSE events separated by blank line
         let idx;
         while ((idx = buf.indexOf("\n\n")) !== -1){
