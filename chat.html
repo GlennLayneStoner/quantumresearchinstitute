@@ -13,20 +13,18 @@
     --accent:#00e1ff; --accent-2:#29f0ff;
     --radius:14px; --radius-lg:20px; --radius-xl:24px;
     --shadow:0 12px 36px rgba(0,0,0,.45);
-    --composerH: 88px; /* fallback; JS keeps this accurate */
+    --composerH: 88px;
   }
 
   html,body{
-    margin:0;padding:0;
+    margin:0;padding:0;height:100%;
     background: radial-gradient(1200px 1200px at 20% -10%, #0f1730 0%, var(--bg) 55%);
     color:var(--text);
     font:16px/1.6 Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-    height:100%;
   }
   a{color:var(--accent)}
   .wrap{display:flex;flex-direction:column;min-height:100dvh;padding:8px}
 
-  /* Header */
   header{
     position:sticky;top:0;z-index:10;
     background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
@@ -52,24 +50,14 @@
   .btn.secondary{background:rgba(255,255,255,.03)}
   .btn:disabled{opacity:.6;cursor:not-allowed}
 
-  /* Chat area */
   .chat{
-    flex:1;
-    overflow:auto;
-    scroll-behavior:auto;
-    margin-top:12px;
-    padding:16px;
-    background:var(--panel);
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:var(--radius-xl);
-    box-shadow: 0 10px 40px rgba(0,0,0,.35);
-    display:flex;flex-direction:column;
+    flex:1; overflow:auto; margin-top:12px; padding:16px;
+    background:var(--panel); border:1px solid rgba(255,255,255,.06);
+    border-radius:var(--radius-xl); box-shadow: 0 10px 40px rgba(0,0,0,.35);
+    display:flex;flex-direction:column; min-height:0;
     scroll-padding-bottom: calc(var(--composerH) + env(safe-area-inset-bottom, 0px));
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: contain;
-    min-height:0;
-    overflow-anchor: none;            /* managed by #bottomAnchor */
-    scrollbar-gutter: stable both-edges;
+    -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain;
+    overflow-anchor: none; scrollbar-gutter: stable both-edges;
   }
 
   .msg{display:flex;gap:10px;margin:10px 0}
@@ -106,7 +94,6 @@
     border:1px solid rgba(255,255,255,.12);overflow:auto
   }
 
-  /* Composer */
   .composer{
     position:sticky;bottom:0;margin-top:12px;
     background:linear-gradient(180deg, rgba(17,21,27,.92), rgba(17,21,27,.98));
@@ -125,8 +112,7 @@
   .send-arrow{
     font-size:20px; line-height:1;
     color:var(--accent); cursor:pointer; user-select:none;
-    margin-left:6px; padding:0 6px;
-    display:flex; align-items:center; justify-content:center;
+    margin-left:6px; padding:0 6px; display:flex; align-items:center; justify-content:center;
     transition:transform .15s ease, color .15s ease, opacity .15s ease;
   }
   .send-arrow:hover{ transform:scale(1.25); color:#5ffff0; }
@@ -141,14 +127,12 @@
     margin-bottom: calc(16px + var(--composerH) + env(safe-area-inset-bottom, 0px));
   }
 
-  /* Embed mode */
   .is-embedded html,
   .is-embedded body,
   .is-embedded .wrap{ height:100%; }
   .is-embedded body{ overflow:hidden; }
   .is-embedded .chat{ min-height:0; max-height:100%; }
 
-  /* Pink debug line for anchor position */
   #bottomAnchor::after{
     content:"";
     display:block;
@@ -201,10 +185,10 @@ if (window.self !== window.top) {
 }
 
 /* ---------- config ---------- */
-const API_URL = "https://quantumresearchinstitute.vercel.app/api/qri-chat";
+const API_URL = "/api/qri-chat"; // relative path is safest
 const SYSTEM_PROMPT = `You are Quari, the QRI Theory Guide for the **Quantum Research Institute** (QRI).
-In this chat, “QRI” ALWAYS means **Quantum Research Institute** (the website you’re on), not any other organization.
-If a user mentions or implies “Qualia Research Institute”, briefly note it is a different group and ask if they want to continue with the **Quantum Research Institute** workflow.
+In this chat, "QRI" ALWAYS means **Quantum Research Institute** (the website you're on), not any other organization.
+If a user mentions or implies "Qualia Research Institute", briefly note it is a different group and ask if they want to continue with the **Quantum Research Institute** workflow.
 
 Your job: turn an idea into a rigorous plan through four gates:
 1) Articulate the thesis in one sentence and define terms.
@@ -305,7 +289,6 @@ function settleThenBottom(){
     .then(()=> new Promise(r => requestAnimationFrame(()=>requestAnimationFrame(r))))
     .then(()=> ensureBottom());
 }
-
 if (document.readyState === 'loading'){
   document.addEventListener('DOMContentLoaded', settleThenBottom, {once:true});
 } else {
@@ -314,7 +297,6 @@ if (document.readyState === 'loading'){
 setTimeout(settleThenBottom, 150);
 setTimeout(settleThenBottom, 400);
 
-/* keep pinned only when already near bottom */
 const mo = new MutationObserver(() => { if (isNearBottom()) ensureBottom(); });
 mo.observe(chatEl, { childList: true, subtree: true, characterData: true });
 window.addEventListener('resize', () => { if(isNearBottom()) ensureBottom(); });
@@ -364,7 +346,7 @@ async function sendCurrent(){
   sendBtn.setAttribute('aria-disabled','true');
 
   try{
-    // trim history before sending: keep system + last N pairs
+    // trim history: keep system + last N pairs
     const N = 6;
     const sysIdx = history.findIndex(m => m.role === "system");
     const sys = sysIdx >= 0 ? [history[sysIdx]] : [];
@@ -395,44 +377,42 @@ async function sendCurrent(){
     await guard.clear();
 
     const ctype = res.headers.get("Content-Type") || "";
-    if (STREAMING && !ctype.includes("application/json") && res.body && "getReader" in res.body){
+    if (STREAMING && ctype.includes("text/event-stream") && res.body && "getReader" in res.body){
       bubble.textContent = "";
       let acc = "";
       const reader = res.body.getReader();
       const decoder = new TextDecoder("utf-8");
       let buf = "";
+      let doneAll = false;
 
-      while(true){
+      while(!doneAll){
         const {done, value} = await reader.read();
         if(done) break;
         buf += decoder.decode(value, {stream:true});
 
-// ignore server keepalive pings
-if (event.startsWith("event: ping")) continue;
-
-
-        
-        // process complete SSE events separated by blank line
+        // process complete SSE events
         let idx;
         while ((idx = buf.indexOf("\n\n")) !== -1){
           const event = buf.slice(0, idx);
           buf = buf.slice(idx + 2);
 
-          // concatenate all data lines in this event
+          // ignore server keepalive pings
+          if (event.startsWith("event: ping")) continue;
+
+          // gather data lines
           const dataLines = event.split(/\r?\n/).filter(l => l.startsWith("data:"));
           if (dataLines.length === 0) continue;
 
           for (const dl of dataLines){
             const payload = dl.slice(5).trim();
             if (!payload) continue;
-            if (payload === "[DONE]") { buf = ""; break; }
+            if (payload === "[DONE]") { doneAll = true; break; }
 
             let delta = "";
             try{
               const obj = JSON.parse(payload);
               delta = obj.delta ?? obj.content ?? obj.choices?.[0]?.delta?.content ?? "";
             }catch{
-              // if server sends plain text chunks
               delta = payload;
             }
             if (delta){
@@ -456,7 +436,10 @@ if (event.startsWith("event: ping")) continue;
     saveHistory();
   }catch(err){
     bubble.classList.remove('thinking');
-    bubble.innerHTML = sanitize("Sorry, I could not reach the QRI server. Please try again in a moment.");
+    bubble.innerHTML = sanitize(
+      "Sorry, I could not reach the QRI server." +
+      (err?.message ? `<br><small>${sanitize(err.message)}</small>` : "")
+    );
     console.error(err);
     if(isNearBottom()) ensureBottom();
   }finally{
@@ -473,7 +456,6 @@ sendBtn.addEventListener('keydown', (e)=>{
 inputEl.addEventListener('keydown', (e)=>{
   if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){ sendCurrent(); }
 });
-// Enter to send, Shift+Enter for newline
 (function(){
   const ta = document.getElementById('input');
   ta.addEventListener('keydown', (e) => {
@@ -486,7 +468,7 @@ inputEl.addEventListener('keydown', (e)=>{
 
 newBtn.addEventListener('click', ()=>{
   history = [{role:"system", content:SYSTEM_PROMPT}];
-  saveHistory(); renderHistory(); 
+  saveHistory(); renderHistory();
 });
 exportBtn.addEventListener('click', ()=>{
   const transcript = history.filter(m=>m.role!=="system")
