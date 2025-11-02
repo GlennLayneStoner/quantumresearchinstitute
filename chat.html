@@ -56,10 +56,9 @@
   .chat{
     flex:1;
     overflow:auto;
-    scroll-behavior:auto;           /* JS will smooth when needed */
+    scroll-behavior:auto;
     margin-top:12px;
     padding:16px;
-    /* removed gap padding-bottom; anchor now provides spacer */
     background:var(--panel);
     border:1px solid rgba(255,255,255,.06);
     border-radius:var(--radius-xl);
@@ -67,8 +66,10 @@
     display:flex;flex-direction:column;
     scroll-padding-bottom: calc(var(--composerH) + env(safe-area-inset-bottom, 0px));
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: contain; /* avoid browser bounce fighting us */
-    min-height:0; /* critical so flex child can actually scroll */
+    overscroll-behavior-y: contain;
+    min-height:0;
+    overflow-anchor: none;            /* managed by #bottomAnchor */
+    scrollbar-gutter: stable both-edges;
   }
 
   .msg{display:flex;gap:10px;margin:10px 0}
@@ -91,14 +92,11 @@
     color:#002024;border-color:rgba(0,0,0,.05);
     box-shadow:0 6px 18px rgba(0,225,255,.25)
   }
-
-  /* Assistant contrast boost */
   .msg.assistant .bubble{
     background: rgba(255,255,255,0.10) !important;
     color:#e8eaed !important;
     box-shadow: 0 10px 36px rgba(0,0,0,.35), inset 0 0 0 1px rgba(0,225,255,.14);
   }
-
   .thinking{opacity:.75}
 
   .code{
@@ -124,12 +122,9 @@
     border-radius:16px;padding:12px 14px;outline:none
   }
 
-  /* Minimal send arrow */
   .send-arrow{
     font-size:20px; line-height:1;
-    color:var(--accent);
-    cursor:pointer !important;
-    user-select:none;
+    color:var(--accent); cursor:pointer; user-select:none;
     margin-left:6px; padding:0 6px;
     display:flex; align-items:center; justify-content:center;
     transition:transform .15s ease, color .15s ease, opacity .15s ease;
@@ -138,59 +133,29 @@
   .send-arrow:active{ transform:scale(1.15); opacity:.85; }
   .send-arrow.is-disabled{ opacity:.45; pointer-events:none; }
 
-  /* Hide session count to save space */
   #usage{display:none !important;}
 
-  /* Scroll anchoring + spacer handled by the anchor */
-  .chat { overflow-anchor: none; }
   #bottomAnchor{
-    overflow-anchor: auto;
-    height: 1px;
-    /* spacer equal to composer height + safe-area, prevents clipping without gaps */
+    overflow-anchor:auto;
+    height:1px;
     margin-bottom: calc(16px + var(--composerH) + env(safe-area-inset-bottom, 0px));
   }
 
-/* ---- embed height fix ---- */
-.is-embedded .wrap {
-  min-height: 100%;
-  height: 100%;
-}
-.is-embedded .chat {
-  min-height: 0;
-  max-height: 100%;
-}
+  /* Embed mode */
+  .is-embedded html,
+  .is-embedded body,
+  .is-embedded .wrap{ height:100%; }
+  .is-embedded body{ overflow:hidden; }
+  .is-embedded .chat{ min-height:0; max-height:100%; }
 
-
-/* ---- EMBED MODE: size to the iframe, not the browser ---- */
-.is-embedded html,
-.is-embedded body,
-.is-embedded .wrap{ height:100%; }
-
-.is-embedded body{ overflow:hidden; }            /* outer page doesn't scroll */
-.is-embedded .chat{ min-height:0; max-height:100%; }
-
-/* we removed chat padding-bottom earlier; spacer lives on the anchor */
-.chat { overflow-anchor: none; }
-#bottomAnchor{
-  overflow-anchor:auto;
-  height:1px;
-  margin-bottom: calc(16px + var(--composerH) + env(safe-area-inset-bottom, 0px));
-}
-
-/* optional: keeps the inner scrollbar from popping layout */
-.chat{ scrollbar-gutter: stable both-edges; }
-
-/* TEMP DEBUG: show exactly where the browser thinks the bottom is */
-#bottomAnchor::after{
-  content:"";
-  display:block;
-  height:2px;
-  background:#ff2bd1;          /* hot pink debug line */
-  opacity:.8;
-}
-
-  
-  
+  /* Pink debug line for anchor position */
+  #bottomAnchor::after{
+    content:"";
+    display:block;
+    height:2px;
+    background:#ff2bd1;
+    opacity:.8;
+  }
 </style>
 </head>
 
@@ -208,7 +173,6 @@
   </header>
 
   <main class="chat" id="chat" aria-live="polite" aria-label="Chat messages">
-    <!-- messages will be appended here -->
     <div id="bottomAnchor" aria-hidden="true"></div>
   </main>
 
@@ -228,22 +192,14 @@
 </div>
 
 <script>
-
-  // If running inside a Framer <iframe>, switch to container-height layout
+/* ---------- embed bootstrap ---------- */
 if (window.self !== window.top) {
   document.documentElement.classList.add('is-embedded');
-}
-
-
-// If running inside an <iframe> (Framer or any embed), fix height handling
-if (window.self !== window.top) {
-  document.documentElement.classList.add('is-embedded');
-  // remove 100dvh behavior
   document.querySelector('.wrap').style.minHeight = '100%';
   document.querySelector('.wrap').style.height = '100%';
   document.body.style.overflow = 'hidden';
 }
-  
+
 /* ---------- config ---------- */
 const API_URL = "https://quantumresearchinstitute.vercel.app/api/qri-chat";
 const SYSTEM_PROMPT = `You are Quari, the QRI Theory Guide for the **Quantum Research Institute** (QRI).
@@ -262,6 +218,7 @@ Keep answers short, numbered, and end with one actionable next step. Avoid jargo
 const HISTORY_KEY = "qriHistoryV1";
 const MAX_TURNS  = 30;
 const STREAMING  = true;
+const BIG_PASTE = 8000; // chars
 
 const chatEl = document.getElementById('chat');
 const bottomAnchor = document.getElementById('bottomAnchor');
@@ -304,11 +261,6 @@ setComposerPadding();
 function isNearBottom(px = 64){
   return (chatEl.scrollHeight - chatEl.clientHeight - chatEl.scrollTop) <= px;
 }
-function isAnchorVisible(){
-  const cr = chatEl.getBoundingClientRect();
-  const ar = bottomAnchor.getBoundingClientRect();
-  return ar.bottom <= cr.bottom + 0.5; // anchor fully in view
-}
 function hardJumpToBottom(){
   chatEl.scrollTop = chatEl.scrollHeight;
   bottomAnchor.scrollIntoView({block:'end', inline:'nearest', behavior:'auto'});
@@ -316,12 +268,14 @@ function hardJumpToBottom(){
 async function ensureBottom(attempts = 8){
   for(let i=0;i<attempts;i++){
     hardJumpToBottom();
-    if (isAnchorVisible()) return;
+    const cr = chatEl.getBoundingClientRect();
+    const ar = bottomAnchor.getBoundingClientRect();
+    if (ar.bottom <= cr.bottom + 0.5) return;
     await new Promise(r => requestAnimationFrame(r));
   }
 }
 
-/* Render */
+/* ---------- render ---------- */
 function addMessage(role, content){
   const row = el('div', `msg ${role}`);
   const avatar = el('div','avatar');
@@ -361,25 +315,43 @@ setTimeout(settleThenBottom, 150);
 setTimeout(settleThenBottom, 400);
 
 /* keep pinned only when already near bottom */
-const mo = new MutationObserver(() => {
-  if (isNearBottom()) ensureBottom();
-});
+const mo = new MutationObserver(() => { if (isNearBottom()) ensureBottom(); });
 mo.observe(chatEl, { childList: true, subtree: true, characterData: true });
-
-/* re-pin on resize or virtual keyboard changes */
 window.addEventListener('resize', () => { if(isNearBottom()) ensureBottom(); });
 if (window.visualViewport){
   visualViewport.addEventListener('resize', () => { if(isNearBottom()) ensureBottom(); });
+}
+
+/* ---------- network guard ---------- */
+function withTimeout(ms, onTimeout){
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => {
+    try { ctrl.abort("timeout"); } catch {}
+    if (onTimeout) onTimeout();
+  }, ms);
+  function clear(p){ return Promise.resolve(p).finally(() => clearTimeout(timer)); }
+  return { signal: ctrl.signal, clear };
 }
 
 /* ---------- sending ---------- */
 async function sendCurrent(){
   const text = inputEl.value.trim();
   if(!text) return;
+
   inputEl.value = "";
   addMessage('user', text);
   history.push({role:"user", content:text});
   saveHistory();
+
+  // staged mode for very large pastes
+  let staged = false;
+  if (text.length > BIG_PASTE){
+    staged = true;
+    history.push({
+      role:"system",
+      content: "User pasted a long document. Only return: (1) one sentence thesis, (2) a 6 point outline, (3) 5 clarifying questions. Then stop."
+    });
+  }
 
   const row = el('div','msg assistant');
   const avatar = el('div','avatar');
@@ -392,36 +364,77 @@ async function sendCurrent(){
   sendBtn.setAttribute('aria-disabled','true');
 
   try{
-    const body = { messages: history, meta: { escalate: !!escalateBox.checked } };
-    const res = await fetch(API_URL, {
-      method:"POST",
-      headers: { "Content-Type":"application/json" },
-      body: JSON.stringify(body)
+    // trim history before sending: keep system + last N pairs
+    const N = 6;
+    const sysIdx = history.findIndex(m => m.role === "system");
+    const sys = sysIdx >= 0 ? [history[sysIdx]] : [];
+    const recent = history.filter(m => m.role !== "system").slice(-N*2);
+    const compact = sys.concat(recent);
+
+    const body = { messages: compact, meta: { escalate: !!escalateBox.checked } };
+
+    // 28s guard for TTFB
+    const guard = withTimeout(28000, () => {
+      bubble.classList.remove('thinking');
+      bubble.innerHTML = sanitize(
+        staged
+          ? "Long document detected. I will respond in stages. First the thesis, outline, and clarifying questions."
+          : "This turn is taking a while. I will answer in stages so nothing times out."
+      );
     });
 
+    const res = await fetch(API_URL, {
+      method:"POST",
+      headers: {
+        "Content-Type":"application/json",
+        "Accept":"text/event-stream"
+      },
+      body: JSON.stringify(body),
+      signal: guard.signal
+    });
+    await guard.clear();
+
     const ctype = res.headers.get("Content-Type") || "";
-    if(STREAMING && !ctype.includes("application/json") && res.body && "getReader" in res.body){
+    if (STREAMING && !ctype.includes("application/json") && res.body && "getReader" in res.body){
       bubble.textContent = "";
       let acc = "";
       const reader = res.body.getReader();
       const decoder = new TextDecoder("utf-8");
+      let buf = "";
+
       while(true){
         const {done, value} = await reader.read();
         if(done) break;
-        const chunk = decoder.decode(value, {stream:true});
-        const lines = chunk.split(/\r?\n/).filter(Boolean);
-        for(const line of lines){
-          const m = line.startsWith("data:") ? line.slice(5).trim() : line;
-          try{
-            const obj = JSON.parse(m);
-            const delta = obj.delta ?? obj.content ?? "";
-            acc += delta;
-            bubble.innerHTML = sanitize(acc);
-            if(isNearBottom()) ensureBottom();
-          }catch{
-            acc += m;
-            bubble.innerHTML = sanitize(acc);
-            if(isNearBottom()) ensureBottom();
+        buf += decoder.decode(value, {stream:true});
+
+        // process complete SSE events separated by blank line
+        let idx;
+        while ((idx = buf.indexOf("\n\n")) !== -1){
+          const event = buf.slice(0, idx);
+          buf = buf.slice(idx + 2);
+
+          // concatenate all data lines in this event
+          const dataLines = event.split(/\r?\n/).filter(l => l.startsWith("data:"));
+          if (dataLines.length === 0) continue;
+
+          for (const dl of dataLines){
+            const payload = dl.slice(5).trim();
+            if (!payload) continue;
+            if (payload === "[DONE]") { buf = ""; break; }
+
+            let delta = "";
+            try{
+              const obj = JSON.parse(payload);
+              delta = obj.delta ?? obj.content ?? obj.choices?.[0]?.delta?.content ?? "";
+            }catch{
+              // if server sends plain text chunks
+              delta = payload;
+            }
+            if (delta){
+              acc += delta;
+              bubble.innerHTML = sanitize(acc);
+              if(isNearBottom()) ensureBottom();
+            }
           }
         }
       }
@@ -429,9 +442,9 @@ async function sendCurrent(){
       history.push({role:"assistant", content:acc});
       if(isNearBottom()) ensureBottom();
     }else{
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       bubble.classList.remove('thinking');
-      bubble.innerHTML = sanitize(data.content || "");
+      bubble.innerHTML = sanitize(data.content || "I could not parse the server response.");
       history.push({role:"assistant", content:data.content || ""});
       if(isNearBottom()) ensureBottom();
     }
@@ -455,6 +468,7 @@ sendBtn.addEventListener('keydown', (e)=>{
 inputEl.addEventListener('keydown', (e)=>{
   if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){ sendCurrent(); }
 });
+// Enter to send, Shift+Enter for newline
 (function(){
   const ta = document.getElementById('input');
   ta.addEventListener('keydown', (e) => {
@@ -467,7 +481,7 @@ inputEl.addEventListener('keydown', (e)=>{
 
 newBtn.addEventListener('click', ()=>{
   history = [{role:"system", content:SYSTEM_PROMPT}];
-  saveHistory(); renderHistory(); settleThenBottom();
+  saveHistory(); renderHistory(); 
 });
 exportBtn.addEventListener('click', ()=>{
   const transcript = history.filter(m=>m.role!=="system")
